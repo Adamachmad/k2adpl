@@ -47,23 +47,32 @@
                             <span class="notification-count">3 Baru</span>
                         </div>
                         <div class="notification-list">
-                            <div class="notification-item unread">
+                            
+                            <a href="{{ route('reports.show', ['report' => 3]) }}" class="notification-item unread">
                                 <div class="notification-icon success">✓</div>
                                 <div class="notification-content">
                                     <h4>Laporan Selesai</h4>
                                     <p>Laporan Anda tentang "Pembuangan Limbah Padi" telah selesai ditangani.</p>
                                     <span class="notification-time">15 menit lalu</span>
                                 </div>
-                            </div>
-                            <div class="notification-item unread">
+                            </a>
+                            <a href="{{ route('reports.show', ['report' => 2]) }}" class="notification-item unread">
                                 <div class="notification-icon info">💬</div>
                                 <div class="notification-content">
                                     <h4>Komentar Baru</h4>
-                                    <p>Budi mengomentari laporan Anda.</p>
+                                    <p>Budi mengomentari laporan Anda: "Penggundulan Hutan Liar di Wawonii".</p>
                                     <span class="notification-time">1 jam lalu</span>
                                 </div>
+                            </a>
+                             <a href="{{ route('reports.show', ['report' => 4]) }}" class="notification-item">
+                                <div class="notification-icon warning">⚠️</div>
+                                <div class="notification-content">
+                                    <h4>Status Diperbarui</h4>
+                                    <p>Laporan Anda tentang "Polusi Smelter PT VDNI" sedang dalam proses.</p>
+                                    <span class="notification-time">3 jam lalu</span>
+                                </div>
+                            </a>
                             </div>
-                        </div>
                         <div class="notification-footer">
                             <a href="#" class="view-all-btn">Lihat Semua Notifikasi</a>
                         </div>
