@@ -24,9 +24,12 @@
 
     <div class="form-container">
         <div class="container">
-            <form class="summary-container" action="{{ route('reports.store') }}" method="POST">
+            
+            <form class="summary-container" action="{{ route('reports.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-
+                
+                {{-- Nanti di sini kita akan meletakkan input hidden untuk semua data dari langkah sebelumnya --}}
+                
                 <div class="summary-section">
                     <h3 class="summary-title">Jenis Laporan</h3>
                     <p class="summary-value">Pencemaran Air</p>
@@ -49,10 +52,6 @@
                             <img src="https://via.placeholder.com/150" alt="Foto 1">
                             <span>foto-sungai.jpg</span>
                         </div>
-                        <div class="file-preview-item">
-                            <img src="https://via.placeholder.com/150" alt="Foto 2">
-                            <span>pipa-limbah.jpg</span>
-                        </div>
                     </div>
                 </div>
 
@@ -68,7 +67,7 @@
                     <button type="submit" class="btn-next">Kirim Laporan</button>
                 </div>
             </form>
-            </div>
+        </div>
     </div>
 </div>
 @endsection

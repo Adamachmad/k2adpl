@@ -2,77 +2,94 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Report; // Pastikan Model Report di-import
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth; // Import facade untuk autentikasi
 
 class ReportController extends Controller
 {
     /**
-     * Menampilkan halaman detail untuk laporan tertentu.
+     * Menampilkan daftar laporan milik pengguna yang sedang login.
+     * (Untuk halaman "Laporan Saya")
+     */
+    public function index(): View
+    {
+        // Mengambil laporan dari database HANYA untuk user yang sedang login.
+        // Diurutkan dari yang paling baru.
+        $reports = Report::where('user_id', Auth::id())->latest()->paginate(10);
+
+        return view('reports.index', compact('reports'));
+    }
+
+    /**
+     * Menampilkan semua laporan untuk publik.
+     * (Untuk halaman "Laporan Publik")
+     */
+    public function publicIndex(): View
+    {
+        // Mengambil semua laporan dari database, diurutkan dari yang paling baru.
+        $reports = Report::latest()->paginate(10);
+
+        return view('reports.public', compact('reports'));
+    }
+
+    /**
+     * Menampilkan halaman detail untuk laporan tertentu dari database.
      */
     public function show($id): View
     {
-        // LANGKAH 1: Buat data laporan statis (database palsu)
-        // Nanti ini akan kita ganti dengan pengambilan data dari database asli.
-        $reports = [
-            1 => [
-                'id' => 1,
-                'title' => 'Pencemaran Laut Pulau Kabaena',
-                'category' => 'Pencemaran Air',
-                'location' => 'Bombana, Sulawesi Tenggara',
-                'image_url' => 'https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/70495b491d493198a97b72ca55f1c7d45672ae57?placeholderIfAbsent=true&format=webp&width=800',
-                'description' => 'Terjadi tumpahan minyak dari kapal tongkang yang menyebabkan pencemaran di sepanjang pantai Pulau Kabaena, membahayakan ekosistem terumbu karang.',
-                'reporter' => 'Warga Lokal',
-                'date' => '13 Juni 2025',
-                'status' => 'Aktif',
-                'status_class' => 'active'
-            ],
-            2 => [
-                'id' => 2,
-                'title' => 'Penggundulan Hutan Liar Wawonii',
-                'category' => 'Deforestasi',
-                'location' => 'Konawe Kepulauan, Sulawesi Tenggara',
-                'image_url' => 'https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/624e7fcaf2f3148b658fbab940f49a9390432f27?placeholderIfAbsent=true&format=webp&width=800',
-                'description' => 'Aktivitas penebangan pohon ilegal skala besar terdeteksi di kawasan hutan lindung Wawonii. Diperlukan tindakan segera untuk menghentikan kerusakan lebih lanjut.',
-                'reporter' => 'Ani P.',
-                'date' => '10 Juni 2025',
-                'status' => 'Diproses',
-                'status_class' => 'processing'
-            ],
-            3 => [
-                'id' => 3,
-                'title' => 'Pembuangan Limbah Padi Tongauna',
-                'category' => 'Pencemaran Tanah',
-                'location' => 'Konawe, Sulawesi Tenggara',
-                'image_url' => 'https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/7c8a0ad64e23c77aba14a983cb0c44b9f3efd777?placeholderIfAbsent=true&format=webp&width=800',
-                'description' => 'Limbah sisa penggilingan padi dibuang sembarangan di lahan kosong dekat area pertanian, menimbulkan bau tidak sedap dan mencemari tanah sekitar.',
-                'reporter' => 'Petani Lokal',
-                'date' => '05 Juni 2025',
-                'status' => 'Selesai',
-                'status_class' => 'completed'
-            ],
-            4 => [
-                'id' => 4,
-                'title' => 'Polusi Smelter PT VDNI',
-                'category' => 'Pencemaran Udara',
-                'location' => 'Konawe, Sulawesi Tenggara',
-                'image_url' => 'https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/8ec9bb7dfb0b27b3c9bc530655a4e010361d6844?placeholderIfAbsent=true&format=webp&width=800',
-                'description' => 'Asap tebal dan debu dari cerobong smelter PT VDNI seringkali menyelimuti desa-desa sekitar, menyebabkan gangguan pernapasan pada warga.',
-                'reporter' => 'Budi S.',
-                'date' => '12 Juni 2025',
-                'status' => 'Aktif',
-                'status_class' => 'active'
-            ],
-        ];
+        // Mengambil satu laporan dari database berdasarkan ID.
+        // findOrFail akan otomatis menampilkan halaman 404 jika ID tidak ditemukan.
+        $report = Report::findOrFail($id);
 
-        // LANGKAH 2: Cari laporan berdasarkan ID yang diklik
-        // Jika tidak ditemukan, tampilkan halaman error 404
-        $report = $reports[$id] ?? null;
-        if (!$report) {
-            abort(404);
-        }
-
-        // LANGKAH 3: Kirim data laporan yang ditemukan ke view 'reports.show'
         return view('reports.show', compact('report'));
     }
+
+    /**
+     * Menyimpan laporan baru ke database.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        // 1. Validasi data yang masuk dari form
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string',
+            'photos' => 'required|array|min:1|max:5', // Minimal 1, maksimal 5 foto
+            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // Maksimal 5MB per foto
+            'terms' => 'required',
+        ]);
+
+        // 2. Proses unggahan foto
+        $photoPaths = [];
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                // Simpan foto di folder 'storage/app/public/report-photos'
+                $path = $photo->store('report-photos', 'public');
+                $photoPaths[] = $path;
+            }
+        }
+
+        // 3. Simpan data laporan ke dalam tabel 'reports'
+        Report::create([
+            'user_id' => Auth::id(), // Mengambil ID user yang sedang login
+            'judul' => $validatedData['title'],
+            'deskripsi' => $validatedData['description'],
+            'lokasi' => $validatedData['location'],
+            // fotoBukti disimpan sebagai JSON yang berisi array path semua foto
+            'fotoBukti' => json_encode($photoPaths), 
+            'status' => 'DITUNDA', // Status awal saat laporan dibuat
+        ]);
+
+        // 4. Arahkan pengguna ke halaman sukses dengan pesan
+        return redirect()->route('reports.success')->with('status', 'Laporan berhasil dikirim!');
+    }
+    
+    // Metode untuk menampilkan form multi-langkah (sudah tidak memerlukan logika kompleks)
+    public function createStep1() { return view('reports.create'); }
+    public function createStep2(Request $request) { return view('reports.create-step-2', ['data' => $request->all()]); }
+    public function createStep3(Request $request) { return view('reports.create-step-3', ['data' => $request->all()]); }
+    public function createStep4(Request $request) { return view('reports.create-step-4', ['data' => $request->all()]); }
 }

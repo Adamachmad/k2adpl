@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController; // Pastikan ini ada
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EducationController;
 
@@ -15,88 +16,53 @@ use App\Http\Controllers\EducationController;
 |
 */
 
-// =======================================================
-// === HALAMAN PUBLIK & AUTENTIKASI ===
-// =======================================================
-
 // Route Halaman Utama (Homepage)
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Route untuk Autentikasi
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
 
+// =======================================================
+// === HALAMAN PUBLIK & AUTENTIKASI ===
+// =======================================================
+
+// Menampilkan halaman form login
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+
+// Memproses data dari form login
+Route::post('/login', function () {
+    return 'Metode POST berhasil dipanggil!';
+});
+
+// Menampilkan halaman form registrasi
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
+// Memproses data dari form registrasi (persiapan untuk nanti)
+// Route::post('/register', [RegisterController::class, 'register']);
 
-// =======================================================
-// === ALUR PEMBUATAN LAPORAN (MULTI-STEP) ===
-// =======================================================
-
-// Langkah 1: Halaman memilih Jenis Laporan
-Route::get('/laporan/buat', function () {
-    return view('reports.create');
-})->name('reports.create');
-
-// Langkah 2: Halaman mengisi Detail Lokasi
-Route::get('/laporan/buat/detail-lokasi', function () {
-    return view('reports.create-step-2');
-})->name('reports.create.step2');
-
-// Langkah 3: Halaman mengisi Deskripsi & Foto
-Route::get('/laporan/buat/deskripsi', function () {
-    return view('reports.create-step-3');
-})->name('reports.create.step3');
-
-// Langkah 4: Halaman Konfirmasi Laporan
-Route::get('/laporan/buat/konfirmasi', function () {
-    return view('reports.create-step-4');
-})->name('reports.create.step4');
-
-// Logika Pengiriman Form (method POST)
-Route::post('/laporan/kirim', function () {
-    // Logika backend untuk menyimpan data akan ada di sini.
-    // Untuk sekarang, kita arahkan ke halaman sukses.
-    return redirect()->route('reports.success');
-})->name('reports.store');
-
-// Halaman Sukses setelah mengirim laporan
-Route::get('/laporan/sukses', function () {
-    return view('reports.success');
-})->name('reports.success');
+// Route untuk logout (persiapan untuk nanti)
+// Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 // =======================================================
-// === ALUR MELIHAT LAPORAN ===
+// === ALUR PEMBUATAN LAPORAN ===
 // =======================================================
+Route::get('/laporan/buat', [ReportController::class, 'createStep1'])->name('reports.create');
+Route::get('/laporan/buat/detail-lokasi', [ReportController::class, 'createStep2'])->name('reports.create.step2');
+Route::get('/laporan/buat/deskripsi', [ReportController::class, 'createStep3'])->name('reports.create.step3');
+Route::get('/laporan/buat/konfirmasi', [ReportController::class, 'createStep4'])->name('reports.create.step4');
+Route::post('/laporan/kirim', [ReportController::class, 'store'])->name('reports.store');
+Route::get('/laporan/sukses', function () { return view('reports.success'); })->name('reports.success');
 
-// Halaman untuk melihat semua laporan publik
-Route::get('/laporan/publik', function () {
-    return view('reports.public');
-})->name('reports.public');
 
-// Halaman untuk melihat laporan milik pengguna yang sedang login
-Route::get('/laporan-saya', function () {
-    return view('reports.index');
-})->name('reports.index');
-
-// laporan
-
+// =======================================================
+// === ALUR MELIHAT LAPORAN & EDUKASI ===
+// =======================================================
+Route::get('/laporan/publik', [ReportController::class, 'publicIndex'])->name('reports.public');
+Route::get('/laporan-saya', [ReportController::class, 'index'])->name('reports.index');
 Route::get('/laporan/{report}', [ReportController::class, 'show'])->name('reports.show');
-// edukasi
+
+Route::get('/edukasi', function () { return view('education.index'); })->name('education.index');
 Route::get('/edukasi/{article}', [EducationController::class, 'show'])->name('education.show');
-
-
-// =======================================================
-// === HALAMAN LAINNYA ===
-// =======================================================
-
-// Halaman Edukasi
-Route::get('/edukasi', function () {
-    return view('education.index');
-})->name('education.index');

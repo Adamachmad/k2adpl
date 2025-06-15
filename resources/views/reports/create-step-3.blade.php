@@ -36,19 +36,21 @@
 
     <div class="form-container">
         <div class="container">
+            
             <form class="report-form" action="{{ route('reports.create.step4') }}" method="GET">
-            <div class="form-section">
+
+                <div class="form-section">
                     <h3 class="form-section-title">
                         <span class="input-icon">📝</span>
                         Detail Laporan
                     </h3>
                     <div class="form-group">
                         <label for="judul" class="form-label">Judul Laporan <span class="required">*</span></label>
-                        <input type="text" id="judul" class="form-input" placeholder="Contoh: Tumpukan Sampah Liar di Tepi Sungai" required>
+                        <input type="text" id="judul" name="title" class="form-input" placeholder="Contoh: Tumpukan Sampah Liar di Tepi Sungai" required>
                     </div>
                     <div class="form-group">
                         <label for="deskripsi" class="form-label">Deskripsi Rinci <span class="required">*</span></label>
-                        <textarea id="deskripsi" class="form-textarea" rows="6" placeholder="Jelaskan secara rinci apa yang terjadi, siapa yang terlibat (jika tahu), dampaknya, dll." required></textarea>
+                        <textarea id="deskripsi" name="description" class="form-textarea" rows="6" placeholder="Jelaskan secara rinci apa yang terjadi, siapa yang terlibat (jika tahu), dampaknya, dll." required></textarea>
                     </div>
                 </div>
 
@@ -64,8 +66,8 @@
                                 <span class="upload-text">Seret & letakkan file di sini, atau <strong>klik untuk memilih</strong></span>
                                 <span class="upload-hint">PNG, JPG, GIF hingga 10MB</span>
                             </div>
-                            <input type="file" id="foto-upload" multiple accept="image/*" hidden>
                         </label>
+                        <input type="file" id="foto-upload" name="photos[]" multiple accept="image/*" class="file-input-hidden">
                         <div class="file-preview-container" id="file-preview">
                             </div>
                     </div>
@@ -80,43 +82,55 @@
     </div>
 </div>
 
+<style>
+.file-input-hidden {
+    width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1;
+}
+</style>
+
 <script>
-// Script untuk preview foto (tidak ada perubahan di sini)
+// Script untuk preview foto dan klik label
 document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.getElementById('foto-upload');
     const previewContainer = document.getElementById('file-preview');
+    const fileUploadArea = document.querySelector('.file-upload-area');
 
-    fileInput.addEventListener('change', function () {
-        previewContainer.innerHTML = '';
-        const files = this.files;
-        if (files.length > 5) {
-            alert('Anda hanya bisa mengunggah maksimal 5 foto.');
-            this.value = '';
-            return;
-        }
+    if(fileUploadArea) {
+        fileUploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    }
 
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const previewWrapper = document.createElement('div');
-                    previewWrapper.classList.add('file-preview-item');
-
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-
-                    const fileName = document.createElement('span');
-                    fileName.textContent = file.name;
-
-                    previewWrapper.appendChild(img);
-                    previewWrapper.appendChild(fileName);
-                    previewContainer.appendChild(previewWrapper);
-                }
-                reader.readAsDataURL(file);
+    if(fileInput) {
+        fileInput.addEventListener('change', function () {
+            previewContainer.innerHTML = '';
+            const files = this.files;
+            if (files.length > 5) {
+                alert('Anda hanya bisa mengunggah maksimal 5 foto.');
+                this.value = '';
+                return;
             }
-        }
-    });
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const previewWrapper = document.createElement('div');
+                        previewWrapper.classList.add('file-preview-item');
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        const fileName = document.createElement('span');
+                        fileName.textContent = file.name;
+                        previewWrapper.appendChild(img);
+                        previewWrapper.appendChild(fileName);
+                        previewContainer.appendChild(previewWrapper);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    }
 });
 </script>
 @endsection

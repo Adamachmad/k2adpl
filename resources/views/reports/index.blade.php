@@ -11,6 +11,7 @@
             <p class="page-subtitle-alt">Lacak status dan lihat detail semua laporan kerusakan lingkungan yang telah Anda kirim.</p>
         </div>
     </div>
+
     <div class="main-content-alt">
         <div class="container">
             <div class="filter-bar">
@@ -20,26 +21,46 @@
                 <button class="filter-btn">Selesai</button>
                 <button class="filter-btn">Ditolak</button>
             </div>
+
             <div class="report-list">
-                <div class="report-list-item">
-                    <img src="https://images.unsplash.com/photo-1624375354913-afe132152873?q=80&w=1470&auto=format&fit=crop" alt="Contoh Laporan" class="report-item-img">
-                    <div class="report-item-content">
-                        <div class="report-item-header">
-                            <span class="report-item-category">Deforestasi</span>
-                            <span class="status-badge processing">Diproses</span>
+                
+                {{-- @forelse akan melakukan loop jika ada laporan, dan menjalankan @empty jika tidak ada --}}
+                @forelse($reports as $report)
+                    <div class="report-list-item">
+                        @php
+                            // Mengambil foto pertama dari array JSON di kolom fotoBukti
+                            $photos = json_decode($report->fotoBukti);
+                            $firstPhotoUrl = ($photos && !empty($photos)) ? asset('storage/' . $photos[0]) : asset('img/placeholder.jpg');
+                        @endphp
+                        <img src="{{ $firstPhotoUrl }}" alt="{{ $report->judul }}" class="report-item-img">
+                        
+                        <div class="report-item-content">
+                            <div class="report-item-header">
+                                <span class="report-item-category">{{-- Nanti bisa ditambahkan kolom kategori --}}</span>
+                                <span class="status-badge {{ strtolower($report->status) }}">{{ $report->status }}</span>
+                            </div>
+                            <h3 class="report-item-title">{{ $report->judul }}</h3>
+                            <p class="report-item-location">{{ $report->lokasi }}</p>
+                            <p class="report-item-date">Dilaporkan pada: {{ $report->created_at->format('d F Y') }}</p>
                         </div>
-                        <h3 class="report-item-title">Penggundulan Hutan Liar di Wawonii</h3>
-                        <p class="report-item-location">Konawe Kepulauan, Sulawesi Tenggara</p>
-                        <p class="report-item-date">Dilaporkan pada: 10 Juni 2025</p>
+                        <a href="{{ route('reports.show', $report->id) }}" class="btn-detail">Lihat Detail</a>
                     </div>
-                    <a href="{{ route('reports.show', ['report' => 2]) }}" class="btn-detail">Lihat Detail</a>
-                </div>
-                </div>
-            <nav class="pagination">
-                <a href="#" class="page-link disabled">Sebelumnya</a>
-                <a href="#" class="page-link active">1</a>
-                <a href="#" class="page-link">Selanjutnya</a>
-            </nav>
+                @empty
+                    {{-- Bagian ini akan tampil jika tidak ada laporan sama sekali --}}
+                    <div class="empty-state">
+                        <img src="{{ asset('img/empty-state.svg') }}" alt="Tidak ada laporan" class="empty-state-img">
+                        <h2 class="empty-state-title">Anda Belum Membuat Laporan</h2>
+                        <p class="empty-state-text">Mari berkontribusi untuk lingkungan yang lebih baik dengan melaporkan masalah di sekitar Anda.</p>
+                        <a href="{{ route('reports.create') }}" class="btn-primary" style="background: var(--primary-green); color: white;">Buat Laporan Baru</a>
+                    </div>
+                @endforelse
+            </div>
+
+            {{-- Menampilkan link Paginasi --}}
+            <div class="pagination-container" style="margin-top: 2rem;">
+                {{ $reports->links() }}
+            </div>
+            
         </div>
     </div>
 </div>

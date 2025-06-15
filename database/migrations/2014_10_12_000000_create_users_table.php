@@ -11,18 +11,21 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
-    }
+   public function up(): void
+{
+    Schema::create('users', function (Blueprint $table) {
+        $table->id(); // Ini adalah 'userid' Anda
+        $table->string('nama'); // Sesuai diagram Anda
+        $table->string('email')->unique();
+        $table->timestamp('email_verified_at')->nullable();
+        $table->string('password');
+        $table->string('role'); // Penambahan kolom 'role' (misal: user, admin, dinas)
+        $table->boolean('statusAktif')->default(true); // Penambahan kolom 'statusAktif'
+        $table->string('googleId')->nullable(); // Penambahan kolom 'googleId', bisa kosong
+        $table->rememberToken();
+        $table->timestamps(); // Ini sudah mencakup 'tanggalDibuat' (created_at)
+    });
+}
 
     /**
      * Reverse the migrations.
