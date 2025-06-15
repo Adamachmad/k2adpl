@@ -4,13 +4,37 @@
 
 @section('content')
 <div class="login-container">
-    <div class="login-content" style="grid-template-columns: 1fr;">
+    <div class="login-content">
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <a href="{{ route('home') }}" class="logo mb-4" style="text-decoration: none;">
+                    <img src="{{ asset('img/logo-ecowatch.svg') }}" alt="Logo EcoWatch" class="logo-svg" style="height: 50px;">
+                </a>
+                <h1 class="welcome-title">Bergabunglah dengan Gerakan Peduli Lingkungan</h1>
+                <p class="welcome-description">Setiap laporan, setiap aksi, dan setiap suara Anda membantu menciptakan bumi yang lebih hijau dan sehat untuk generasi mendatang.</p>
+                <div class="feature-cards">
+                    <div class="feature-card">
+                        <div class="feature-icon blue">📸</div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Laporkan dengan Mudah</h3>
+                            <p class="feature-description">Ambil foto, beri deskripsi, dan kirim laporan kerusakan lingkungan dalam hitungan menit.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon green">📈</div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">Pantau Progres</h3>
+                            <p class="feature-description">Lihat status dan tindak lanjut dari setiap laporan yang Anda dan komunitas kirimkan.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('home') }}" class="back-button">← Kembali ke Halaman Utama</a>
+            </div>
+        </div>
+
         <div class="login-section">
             <div class="login-form-container">
                 <div class="form-header">
-                    <a href="{{ route('home') }}" class="logo mb-4">
-                        <img src="{{ asset('img/logo-ecowatch.svg') }}" alt="Logo EcoWatch" class="logo-svg" style="height: 50px;">
-                    </a>
                     <h2 class="form-title">Selamat Datang Kembali</h2>
                     <p class="form-subtitle">Silakan masukkan detail Anda untuk masuk.</p>
                 </div>
@@ -63,27 +87,6 @@
 </div>
 
 <style>
-    /* Menambahkan beberapa style dasar untuk alert error */
-    .alert {
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 0.5rem;
-        border: 1px solid transparent;
-    }
-    .alert-danger {
-        color: #721c24;
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
-    }
-    .alert-danger ul {
-        margin: 0;
-        padding-left: 1.2rem;
-    }
-    .mb-4 {
-        margin-bottom: 1.5rem;
-    }
-    .mt-4 {
-        margin-top: 1.5rem;
-    }
+    .alert{padding:1rem;margin-bottom:1rem;border-radius:.5rem;border:1px solid transparent}.alert-danger{color:#721c24;background-color:#f8d7da;border-color:#f5c6cb}.alert-danger ul{margin:0;padding-left:1.2rem}.mb-4{margin-bottom:1.5rem}.mt-4{margin-top:1.5rem}
 </style>
 @endsection

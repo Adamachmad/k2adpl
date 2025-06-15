@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController; // Pastikan ini ada
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EducationController;
 
@@ -9,18 +9,12 @@ use App\Http\Controllers\EducationController;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
 // Route Halaman Utama (Homepage)
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
-
 
 // =======================================================
 // === HALAMAN PUBLIK & AUTENTIKASI ===
@@ -29,22 +23,14 @@ Route::get('/', function () {
 // Menampilkan halaman form login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 
+// PERBAIKAN DI SINI: Mengembalikan ke controller
 // Memproses data dari form login
-Route::post('/login', function () {
-    return 'Metode POST berhasil dipanggil!';
-});
+Route::post('/login', [LoginController::class, 'login']);
 
 // Menampilkan halaman form registrasi
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
-
-// Memproses data dari form registrasi (persiapan untuk nanti)
-// Route::post('/register', [RegisterController::class, 'register']);
-
-// Route untuk logout (persiapan untuk nanti)
-// Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
 
 // =======================================================
 // === ALUR PEMBUATAN LAPORAN ===
@@ -55,7 +41,6 @@ Route::get('/laporan/buat/deskripsi', [ReportController::class, 'createStep3'])-
 Route::get('/laporan/buat/konfirmasi', [ReportController::class, 'createStep4'])->name('reports.create.step4');
 Route::post('/laporan/kirim', [ReportController::class, 'store'])->name('reports.store');
 Route::get('/laporan/sukses', function () { return view('reports.success'); })->name('reports.success');
-
 
 // =======================================================
 // === ALUR MELIHAT LAPORAN & EDUKASI ===
