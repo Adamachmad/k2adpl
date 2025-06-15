@@ -40,21 +40,27 @@
     </div>
 </section>
 
-<section class="partners">
+<<section class="partners">
     <div class="partners-container">
         <h2 class="partners-title">Aplikasi Yang Bermitra Dengan Kedinasan:</h2>
         <div class="partner-logos">
-            <div class="partner-logo">
-                <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/ada15015f30b3cef19222cde70a267df20f45d12?placeholderIfAbsent=true&format=webp&width=400"
-                     alt="KLH/BPLH - Kementerian Lingkungan Hidup" class="partner-img"
-                     loading="lazy">
+            
+            <a href="https://kemenlh.go.id/" target="_blank" rel="noopener noreferrer" class="partner-link">
+                <div class="partner-logo">
+                    <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/ada15015f30b3cef19222cde70a267df20f45d12?placeholderIfAbsent=true&format=webp&width=400"
+                         alt="Kementerian Lingkungan Hidup dan Kehutanan" class="partner-img"
+                         loading="lazy">
+                </div>
+            </a>
+            
+            <a href="https://kehutanan.go.id/" target="_blank" rel="noopener noreferrer" class="partner-link">
+                <div class="partner-logo">
+                    <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/6544be8787f982baa225bff134d4ce82d0194155?placeholderIfAbsent=true&format=webp&width=400"
+                         alt="Badan Restorasi Gambut dan Mangrove" class="partner-img"
+                         loading="lazy">
+                </div>
+            </a>
             </div>
-            <div class="partner-logo">
-                <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/6544be8787f982baa225bff134d4ce82d0194155?placeholderIfAbsent=true&format=webp&width=400"
-                     alt="Kementerian Kehutanan Republik Indonesia" class="partner-img"
-                     loading="lazy">
-            </div>
-        </div>
     </div>
 </section>
 
