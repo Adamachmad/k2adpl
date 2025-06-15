@@ -1,86 +1,109 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\EducationController;
+use App\Http\Controllers\EducationController; // Pastikan ini di-import jika Anda punya EducationController
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
 */
-
-// Route Halaman Utama (Homepage)
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
 
 // =======================================================
 // === HALAMAN PUBLIK & AUTENTIKASI ===
 // =======================================================
 
-// Menampilkan halaman form login
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-// Memproses data dari form login
-Route::post('/login', [LoginController::class, 'login']);
-// Memproses logout
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+// Route Halaman Utama (Homepage) - SEKARANG MENGAMBIL DATA DARI DATABASE
+Route::get('/', function () {
+    // Ambil 4 laporan terbaru dari database
+    $recentReports = App\Models\Report::latest()->take(4)->get();
+    return view('welcome', compact('recentReports'));
+})->name('home');
 
-// Menampilkan halaman form registrasi
+// Route untuk Login (menampilkan form)
+Route::get('/login', [ReportController::class, 'showLoginForm'])->name('login');
+// Route untuk memproses Login (submit form)
+Route::post('/login', [ReportController::class, 'login']);
+// Route untuk Logout
+Route::post('/logout', [ReportController::class, 'logout'])->name('logout');
+
 Route::get('/register', function () {
     return view('auth.register');
-})->name('register')->middleware('guest');
-
-
+})->name('register');
 
 
 // =======================================================
-// === ALUR PEMBUATAN LAPORAN (MULTI-STEP DINAMIS) ===
+// === ALUR PEMBUATAN LAPORAN (MULTI-STEP) ===
+// Menggunakan middleware 'auth' untuk melindungi rute ini agar hanya bisa diakses user terautentikasi
+// =======================================================
+Route::middleware(['auth'])->group(function () {
+    // Langkah 1: Halaman memilih Jenis Laporan
+    Route::get('/laporan/buat', [ReportController::class, 'createStep1'])->name('reports.create');
+    Route::post('/laporan/buat/step1', [ReportController::class, 'postStep1'])->name('reports.create.step1.post');
+
+    // Langkah 2: Halaman mengisi Detail Lokasi
+    Route::get('/laporan/buat/detail-lokasi', [ReportController::class, 'createStep2'])->name('reports.create.step2');
+    Route::post('/laporan/buat/step2', [ReportController::class, 'postStep2'])->name('reports.create.step2.post');
+
+    // Langkah 3: Halaman mengisi Deskripsi & Foto
+    Route::get('/laporan/buat/deskripsi', [ReportController::class, 'createStep3'])->name('reports.create.step3');
+    Route::post('/laporan/buat/deskripsi', [ReportController::class, 'postStep3'])->name('reports.create.step3.post'); // Aksi POST untuk step 3
+
+    // Langkah 4: Halaman Konfirmasi Laporan
+    Route::get('/laporan/buat/konfirmasi', [ReportController::class, 'createStep4'])->name('reports.create.step4');
+
+    // Logika Pengiriman Form FINAL (method POST)
+    Route::post('/laporan/kirim', [ReportController::class, 'store'])->name('reports.store');
+
+    // Halaman Sukses setelah mengirim laporan
+    Route::get('/laporan/sukses', [ReportController::class, 'success'])->name('reports.success');
+});
+
+
+// =======================================================
+// === ALUR MELIHAT LAPORAN ===
 // =======================================================
 
-// Langkah 1: Menampilkan & Memproses form awal
-Route::get('/laporan/buat', [ReportController::class, 'createStep1'])->name('reports.create');
-Route::post('/laporan/buat', [ReportController::class, 'postStep1'])->name('reports.create.step1.post');
-
-// Langkah 2: Menampilkan & Memproses form detail lokasi
-Route::get('/laporan/buat/detail-lokasi', [ReportController::class, 'createStep2'])->name('reports.create.step2');
-Route::post('/laporan/buat/detail-lokasi', [ReportController::class, 'postStep2'])->name('reports.create.step2.post');
-
-// Langkah 3: Menampilkan & Memproses form deskripsi & foto
-Route::get('/laporan/buat/deskripsi', [ReportController::class, 'createStep3'])->name('reports.create.step3');
-Route::post('/laporan/buat/deskripsi', [ReportController::class, 'postStep3'])->name('reports.create.step3.post');
-
-// Langkah 4: Menampilkan halaman konfirmasi
-Route::get('/laporan/buat/konfirmasi', [ReportController::class, 'createStep4'])->name('reports.create.step4');
-
-// Logika untuk menyimpan laporan ke database
-Route::post('/laporan/kirim', [ReportController::class, 'store'])->name('reports.store');
-
-// Halaman sukses setelah laporan terkirim
-Route::get('/laporan/sukses', function () {
-    return view('reports.success');
-})->name('reports.success');
-
-// ... (Sisa route Anda)
-// =======================================================
-// === ALUR MELIHAT LAPORAN & EDUKASI ===
-// =======================================================
+// Halaman untuk melihat semua laporan publik
 Route::get('/laporan/publik', [ReportController::class, 'publicIndex'])->name('reports.public');
+
+// Halaman untuk melihat laporan milik pengguna yang sedang login (dilindungi Auth)
 Route::get('/laporan-saya', [ReportController::class, 'index'])->name('reports.index')->middleware('auth');
-Route::get('/laporan/{report}', [ReportController::class, 'show'])->name('reports.show')->middleware('auth');
 
-Route::get('/edukasi', [EducationController::class, 'index'])->name('education.index');
-Route::get('/edukasi/{article}', [EducationController::class, 'show'])->name('education.show');
+// Halaman untuk menampilkan detail dari satu laporan
+// {report} adalah parameter dinamis, misal /laporan/1 atau /laporan/2
+Route::get('/laporan/{report}', [ReportController::class, 'show'])->name('reports.show');
 
 
 // =======================================================
-// === HALAMAN DASHBOARD BERDASARKAN ROLE ===
+// === HALAMAN EDUKASI ===
 // =======================================================
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->name('admin.dashboard')->middleware('auth'); // Nanti bisa ditambahkan middleware role admin
 
-Route::get('/dinas/dashboard', function () {
-    return view('dinas.dashboard');
-})->name('dinas.dashboard')->middleware('auth'); // Nanti bisa ditambahkan middleware role dinas
+// Halaman utama Edukasi
+Route::get('/edukasi', function () {
+    return view('education.index'); // Atau [EducationController::class, 'index'] jika ada
+})->name('education.index');
+
+// Halaman untuk menampilkan detail artikel edukasi (jika ada EducationController@show)
+// Sesuaikan jika Anda ingin membuat EducationController yang dinamis
+Route::get('/edukasi/{article}', function ($articleId) {
+    // Ini hanyalah contoh data statis. Nanti Anda akan mengambil dari database.
+    $articles = [
+        1 => ['title' => 'Cara Mengurangi Jejak Karbon di Rumah', 'content' => 'Isi lengkap artikel tentang jejak karbon...', 'image' => 'https://images.unsplash.com/photo-1542601904-45B6A6358354?q=80&w=1470&auto=format&fit=crop'],
+        2 => ['title' => 'Pentingnya Daur Ulang untuk Masa Depan', 'content' => 'Isi lengkap artikel tentang daur ulang...', 'image' => 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=1470&auto=format&fit=crop'],
+        3 => ['title' => 'Dampak Perubahan Iklim Global', 'content' => 'Isi lengkap artikel tentang perubahan iklim...', 'image' => 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?q=80&w=1441&auto=format&fit=crop'],
+    ];
+
+    $article = $articles[$articleId] ?? null;
+
+    if (!$article) {
+        abort(404, 'Artikel tidak ditemukan.');
+    }
+    return view('education.show', compact('article'));
+})->name('education.show');

@@ -29,7 +29,9 @@
                     <button class="nav-link dropdown-toggle">Laporan</button>
                     <div class="dropdown-menu">
                         <a href="{{ route('reports.public') }}" class="dropdown-item">Laporan Publik</a>
+                        @auth
                         <a href="{{ route('reports.index') }}" class="dropdown-item">Laporan Saya</a>
+                        @endauth
                     </div>
                 </div>
                 <a href="{{ route('education.index') }}" class="nav-link">Edukasi</a>
@@ -42,12 +44,43 @@
                         <div class="notification-badge">3</div>
                     </button>
                     <div class="notification-overlay" id="notification-overlay">
-                        {{-- Konten Notifikasi --}}
+                        <div class="notification-header">
+                            <h3>Notifikasi</h3>
+                            <span class="notification-count">3 Baru</span>
+                        </div>
+                        <div class="notification-list">
+                            <a href="{{ route('reports.show', ['report' => 3]) }}" class="notification-item unread">
+                                <div class="notification-icon success">✓</div>
+                                <div class="notification-content">
+                                    <h4>Laporan Selesai</h4>
+                                    <p>Laporan Anda tentang "Pembuangan Limbah Padi" telah selesai ditangani.</p>
+                                    <span class="notification-time">15 menit lalu</span>
+                                </div>
+                            </a>
+                            <a href="{{ route('reports.show', ['report' => 2]) }}" class="notification-item unread">
+                                <div class="notification-icon info">💬</div>
+                                <div class="notification-content">
+                                    <h4>Komentar Baru</h4>
+                                    <p>Budi mengomentari laporan Anda: "Penggundulan Hutan Liar di Wawonii".</p>
+                                    <span class="notification-time">1 jam lalu</span>
+                                </div>
+                            </a>
+                            <a href="{{ route('reports.show', ['report' => 4]) }}" class="notification-item">
+                                <div class="notification-icon warning">⚠️</div>
+                                <div class="notification-content">
+                                    <h4>Status Diperbarui</h4>
+                                    <p>Laporan Anda tentang "Polusi Smelter PT VDNI" sedang dalam proses.</p>
+                                    <span class="notification-time">3 jam lalu</span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="notification-footer">
+                            <a href="#" class="view-all-btn">Lihat Semua Notifikasi</a>
+                        </div>
                     </div>
                 </div>
                 
                 @auth
-                {{-- TAMPILAN JIKA PENGGUNA SUDAH LOGIN --}}
                 <a href="{{ route('reports.create') }}" class="create-report-btn">
                     <span class="btn-icon">+</span>
                     <span>Buat Laporan</span>
@@ -55,9 +88,11 @@
                 <div class="user-dropdown">
                     <button class="user-avatar-button" id="user-menu-button">
                         <div class="user-avatar">
-                             <span>{{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}</span>
+                            {{-- MENGGUNAKAN Auth::user()->nama --}}
+                            <span>{{ Auth::user()->nama ? strtoupper(substr(Auth::user()->nama, 0, 1)) : '?' }}</span>
                         </div>
-                        <span class="user-name">Halo, {{ strtok(Auth::user()->nama, " ") }}</span>
+                        {{-- MENGGUNAKAN Auth::user()->nama --}}
+                        <span class="user-name">Halo, {{ Auth::user()->nama ? strtok(Auth::user()->nama, " ") : 'Pengguna' }}</span>
                         <span class="dropdown-caret">▾</span>
                     </button>
                     <div class="user-dropdown-menu" id="user-menu">
@@ -72,13 +107,13 @@
                 </div>
 
                 @else
-                {{-- TAMPILAN JIKA PENGGUNA BELUM LOGIN (TAMU) --}}
                 <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
                 <a href="{{ route('register') }}" class="create-report-btn">Daftar</a>
                 @endauth
             </div>
         </div>
     </header>
+
     <main>
         @yield('content')
     </main>
@@ -134,7 +169,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Logika untuk Notifikasi
+            // Dropdown Notifikasi
             const notifBtn = document.getElementById('notification-btn');
             const notifOverlay = document.getElementById('notification-overlay');
 
@@ -145,25 +180,28 @@
                 });
             }
 
-            // Logika untuk User Dropdown
-            const userMenuButton = document.getElementById('user-menu-button');
-            const userMenu = document.getElementById('user-menu');
+            // Dropdown User Profile
+            const userMenuButton = document.getElementById('user-menu-button'); // Tombol pemicu dropdown
+            const userDropdownContainer = document.querySelector('.user-dropdown'); // Kontainer utama user dropdown
 
-            if (userMenuButton && userMenu) {
+            if (userMenuButton && userDropdownContainer) {
                 userMenuButton.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    // Menggunakan class untuk toggle, lebih fleksibel
-                    this.parentElement.classList.toggle('open');
+                    event.stopPropagation(); // Mencegah event klik menyebar
+                    userDropdownContainer.classList.toggle('open'); // Toggle class 'open' pada kontainer
+                });
+
+                // Menutup dropdown jika mengklik di luar area user dropdown
+                document.addEventListener('click', function(event) {
+                    if (userDropdownContainer && !userDropdownContainer.contains(event.target)) {
+                        userDropdownContainer.classList.remove('open');
+                    }
                 });
             }
 
-            // Menutup semua dropdown jika mengklik di luar area
+            // Menutup semua dropdown lainnya (notifikasi) jika mengklik di luar area
             document.addEventListener('click', function(event) {
                 if (notifOverlay && !notifOverlay.contains(event.target) && !notifBtn.contains(event.target)) {
                     notifOverlay.classList.remove('show');
-                }
-                if (userMenu && !userMenu.parentElement.contains(event.target)) {
-                    userMenu.parentElement.classList.remove('open');
                 }
             });
         });

@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
-{{-- Judul halaman sekarang dinamis sesuai judul laporan --}}
-@section('title', $report['title'] . ' - Detail Laporan - EcoWatch')
+@section('title', 'Detail Laporan - EcoWatch')
 @section('description', 'Lihat detail lengkap laporan, foto, dan diskusi komunitas terkait masalah lingkungan ini.')
 
 @section('content')
@@ -10,25 +9,45 @@
         <div class="container detail-container">
             <div class="report-main-content">
                 <div class="detail-header">
-                    {{-- Menggunakan data dari Controller --}}
-                    <span class="report-item-category">{{ $report['category'] }}</span>
-                    <h1 class="detail-title">{{ $report['title'] }}</h1>
+                    <span class="report-item-category">{{ $report->category ?? 'Umum' }}</span>
+                    <h1 class="detail-title">{{ $report->judul }}</h1>
                     <div class="detail-meta">
-                        <span>Dilaporkan oleh <strong>{{ $report['reporter'] }}</strong> pada {{ $report['date'] }}</span>
-                        <span class="status-badge {{ $report['status_class'] }}">{{ $report['status'] }}</span>
+                        {{-- Asumsi 'reporter' belum ada di model Report, bisa diganti dengan Auth::user()->name jika laporan milik sendiri --}}
+                        <span>Dilaporkan oleh <strong>{{ $report->user->name ?? 'Pengguna Anonim' }}</strong> pada {{ $report->created_at->format('d F Y') }}</span>
+                        <span class="status-badge {{ strtolower($report->status) }}">{{ $report->status }}</span>
+                        {{-- Tambahkan ID Laporan --}}
+                        <span class="report-id">ID Laporan: {{ $report->id }}</span>
                     </div>
                 </div>
-
                 <div class="photo-gallery">
-                    {{-- Gambar sekarang dinamis sesuai laporan yang diklik --}}
-                    <img src="{{ $report['image_url'] }}" alt="Foto Laporan: {{ $report['title'] }}" class="main-photo">
+                    @php
+                        // Decode JSON string dari fotoBukti menjadi array
+                        $photos = json_decode($report->fotoBukti);
+                    @endphp
+
+                    @if ($photos && is_array($photos) && !empty($photos))
+                        {{-- Menampilkan foto utama (yang pertama dari array) --}}
+                        <img src="{{ asset('storage/' . $photos[0]) }}" alt="Foto Laporan Utama" class="main-photo">
+                        {{-- Jika ada lebih dari satu foto, tampilkan thumbnailnya --}}
+                        @if (count($photos) > 1)
+                            <div class="thumbnail-gallery">
+                                @foreach ($photos as $index => $photo)
+                                    <img src="{{ asset('storage/' . $photo) }}" alt="Thumbnail Foto {{ $index + 1 }}" 
+                                         class="thumbnail-item {{ $index == 0 ? 'active' : '' }}" 
+                                         onclick="changeMainPhoto(this)">
+                                @endforeach
+                            </div>
+                        @endif
+                    @else
+                        {{-- Placeholder jika tidak ada foto --}}
+                        <img src="{{ asset('img/placeholder.jpg') }}" alt="Tidak ada foto" class="main-photo">
+                        <p class="text-center mt-3">Tidak ada foto terlampir untuk laporan ini.</p>
+                    @endif
                 </div>
-                
                 <div class="detail-description-box">
                     <h3 class="section-heading">Deskripsi Laporan</h3>
-                    <p>{{ $report['description'] }}</p>
+                    <p>{{ $report->deskripsi }}</p>
                 </div>
-
                 <div class="comments-section">
                     <h3 class="section-heading">Diskusi & Komentar (2)</h3>
                     <div class="comment-form">
@@ -60,11 +79,10 @@
                     </div>
                 </div>
             </div>
-
             <aside class="report-sidebar">
                 <div class="sidebar-widget">
                     <h4 class="widget-title">Lokasi Kejadian</h4>
-                    <p>{{ $report['location'] }}</p>
+                    <p>{{ $report->lokasi }}</p>
                 </div>
                 <div class="sidebar-widget">
                     <h4 class="widget-title">Bagikan Laporan</h4>
@@ -78,4 +96,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    function changeMainPhoto(thumbnail) {
+        const mainPhoto = document.querySelector('.main-photo');
+        const activeThumbnail = document.querySelector('.thumbnail-item.active');
+
+        if (activeThumbnail) {
+            activeThumbnail.classList.remove('active');
+        }
+        mainPhoto.src = thumbnail.src;
+        thumbnail.classList.add('active');
+    }
+</script>
 @endsection
