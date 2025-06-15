@@ -21,21 +21,28 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        // Validasi data yang masuk
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // Mencoba untuk melakukan login
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            
+            // === LOGIKA PENGALIHAN BERDASARKAN ROLE ===
+            $user = Auth::user();
 
-            // Jika berhasil, arahkan ke halaman utama
-            return redirect()->intended('home');
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'dinas') {
+                return redirect()->route('dinas.dashboard');
+            } else {
+                // Untuk role 'user' atau 'lsm' akan diarahkan ke halaman utama
+                return redirect()->route('home');
+            }
+            // ===========================================
         }
 
-        // Jika gagal, kembalikan ke halaman login dengan pesan error
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan tidak sesuai.',
         ])->onlyInput('email');

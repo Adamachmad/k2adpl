@@ -32,6 +32,14 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
+// Route untuk Dashboard
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
+Route::get('/dinas/dashboard', function () {
+    return view('dinas.dashboard');
+})->name('dinas.dashboard');
 // =======================================================
 // === ALUR PEMBUATAN LAPORAN ===
 // =======================================================
