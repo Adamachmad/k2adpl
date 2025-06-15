@@ -42,53 +42,43 @@
                         <div class="notification-badge">3</div>
                     </button>
                     <div class="notification-overlay" id="notification-overlay">
-                        <div class="notification-header">
-                            <h3>Notifikasi</h3>
-                            <span class="notification-count">3 Baru</span>
-                        </div>
-                        <div class="notification-list">
-                            
-                            <a href="{{ route('reports.show', ['report' => 3]) }}" class="notification-item unread">
-                                <div class="notification-icon success">✓</div>
-                                <div class="notification-content">
-                                    <h4>Laporan Selesai</h4>
-                                    <p>Laporan Anda tentang "Pembuangan Limbah Padi" telah selesai ditangani.</p>
-                                    <span class="notification-time">15 menit lalu</span>
-                                </div>
-                            </a>
-                            <a href="{{ route('reports.show', ['report' => 2]) }}" class="notification-item unread">
-                                <div class="notification-icon info">💬</div>
-                                <div class="notification-content">
-                                    <h4>Komentar Baru</h4>
-                                    <p>Budi mengomentari laporan Anda: "Penggundulan Hutan Liar di Wawonii".</p>
-                                    <span class="notification-time">1 jam lalu</span>
-                                </div>
-                            </a>
-                             <a href="{{ route('reports.show', ['report' => 4]) }}" class="notification-item">
-                                <div class="notification-icon warning">⚠️</div>
-                                <div class="notification-content">
-                                    <h4>Status Diperbarui</h4>
-                                    <p>Laporan Anda tentang "Polusi Smelter PT VDNI" sedang dalam proses.</p>
-                                    <span class="notification-time">3 jam lalu</span>
-                                </div>
-                            </a>
-                            </div>
-                        <div class="notification-footer">
-                            <a href="#" class="view-all-btn">Lihat Semua Notifikasi</a>
-                        </div>
+                        {{-- Konten Notifikasi --}}
                     </div>
                 </div>
+                
+                @auth
+                {{-- TAMPILAN JIKA PENGGUNA SUDAH LOGIN --}}
                 <a href="{{ route('reports.create') }}" class="create-report-btn">
                     <span class="btn-icon">+</span>
                     <span>Buat Laporan</span>
-                <a href="{{ route('login') }}" class="user-avatar" aria-label="Profil Pengguna">
-                 <span class="profile-icon">👤</span>
                 </a>
+                <div class="user-dropdown">
+                    <button class="user-avatar-button" id="user-menu-button">
+                        <div class="user-avatar">
+                             <span>{{ strtoupper(substr(Auth::user()->nama, 0, 1)) }}</span>
+                        </div>
+                        <span class="user-name">Halo, {{ strtok(Auth::user()->nama, " ") }}</span>
+                        <span class="dropdown-caret">▾</span>
+                    </button>
+                    <div class="user-dropdown-menu" id="user-menu">
+                        <a href="{{ route('home') }}" class="dropdown-item">Dashboard</a>
+                        <a href="{{ route('reports.index') }}" class="dropdown-item">Laporan Saya</a>
+                        <div class="dropdown-divider"></div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item logout">Logout</button>
+                        </form>
+                    </div>
                 </div>
+
+                @else
+                {{-- TAMPILAN JIKA PENGGUNA BELUM LOGIN (TAMU) --}}
+                <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
+                <a href="{{ route('register') }}" class="create-report-btn">Daftar</a>
+                @endauth
             </div>
         </div>
     </header>
-
     <main>
         @yield('content')
     </main>
@@ -144,6 +134,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Logika untuk Notifikasi
             const notifBtn = document.getElementById('notification-btn');
             const notifOverlay = document.getElementById('notification-overlay');
 
@@ -152,13 +143,29 @@
                     event.stopPropagation();
                     notifOverlay.classList.toggle('show');
                 });
+            }
 
-                document.addEventListener('click', function(event) {
-                    if (!notifOverlay.contains(event.target) && !notifBtn.contains(event.target)) {
-                        notifOverlay.classList.remove('show');
-                    }
+            // Logika untuk User Dropdown
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userMenu = document.getElementById('user-menu');
+
+            if (userMenuButton && userMenu) {
+                userMenuButton.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    // Menggunakan class untuk toggle, lebih fleksibel
+                    this.parentElement.classList.toggle('open');
                 });
             }
+
+            // Menutup semua dropdown jika mengklik di luar area
+            document.addEventListener('click', function(event) {
+                if (notifOverlay && !notifOverlay.contains(event.target) && !notifBtn.contains(event.target)) {
+                    notifOverlay.classList.remove('show');
+                }
+                if (userMenu && !userMenu.parentElement.contains(event.target)) {
+                    userMenu.parentElement.classList.remove('open');
+                }
+            });
         });
     </script>
 </body>
