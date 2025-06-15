@@ -81,9 +81,9 @@
                 <a href="{{ route('reports.create') }}" class="create-report-btn">
                     <span class="btn-icon">+</span>
                     <span>Buat Laporan</span>
+                <a href="{{ route('login') }}" class="user-avatar" aria-label="Profil Pengguna">
+                 <span class="profile-icon">👤</span>
                 </a>
-                <div class="user-avatar" aria-label="Profil Pengguna">
-                    <span class="profile-icon">👤</span>
                 </div>
             </div>
         </div>
