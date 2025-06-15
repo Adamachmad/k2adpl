@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\EducationController; // Pastikan ini di-import jika Anda punya EducationController
+use App\Http\Controllers\EducationController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\RegisterController as CustomRegisterController; // Import Controller Register kustom Anda
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +21,8 @@ use App\Http\Controllers\EducationController; // Pastikan ini di-import jika And
 // === HALAMAN PUBLIK & AUTENTIKASI ===
 // =======================================================
 
-// Route Halaman Utama (Homepage) - SEKARANG MENGAMBIL DATA DARI DATABASE
+// Route Halaman Utama (Homepage)
 Route::get('/', function () {
-    // Ambil 4 laporan terbaru dari database
     $recentReports = App\Models\Report::latest()->take(4)->get();
     return view('welcome', compact('recentReports'));
 })->name('home');
@@ -33,9 +34,12 @@ Route::post('/login', [ReportController::class, 'login']);
 // Route untuk Logout
 Route::post('/logout', [ReportController::class, 'logout'])->name('logout');
 
+// Route untuk Registrasi (menampilkan form)
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
+// Route untuk memproses Registrasi (submit form)
+Route::post('/register', [CustomRegisterController::class, 'registerUser'])->name('register.post');
 
 
 // =======================================================
@@ -90,8 +94,7 @@ Route::get('/edukasi', function () {
     return view('education.index'); // Atau [EducationController::class, 'index'] jika ada
 })->name('education.index');
 
-// Halaman untuk menampilkan detail artikel edukasi (jika ada EducationController@show)
-// Sesuaikan jika Anda ingin membuat EducationController yang dinamis
+// Halaman untuk menampilkan detail artikel edukasi
 Route::get('/edukasi/{article}', function ($articleId) {
     // Ini hanyalah contoh data statis. Nanti Anda akan mengambil dari database.
     $articles = [
@@ -107,3 +110,19 @@ Route::get('/edukasi/{article}', function ($articleId) {
     }
     return view('education.show', compact('article'));
 })->name('education.show');
+
+// =======================================================
+// === HALAMAN ADMINISTRATOR (Dilindungi Middleware 'auth' dan 'admin') ===
+// =======================================================
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard Admin
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // Pengelolaan Edukasi (Admin saja yang bisa)
+    Route::get('/education', [AdminController::class, 'educationIndex'])->name('education.index');
+    Route::get('/education/create', [AdminController::class, 'createEducation'])->name('education.create');
+    Route::post('/education', [AdminController::class, 'storeEducation'])->name('education.store');
+    Route::get('/education/{id}/edit', [AdminController::class, 'editEducation'])->name('education.edit');
+    Route::put('/education/{id}', [AdminController::class, 'updateEducation'])->name('education.update');
+    Route::delete('/education/{id}', [AdminController::class, 'destroyEducation'])->name('education.destroy');
+});

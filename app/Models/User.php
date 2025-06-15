@@ -44,7 +44,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        // 'password' => 'hashed',
+        // 'password' => 'hashed', // <<< KOMENTARI/HAPUS BARIS INI
     ];
 
     /**
@@ -53,5 +53,11 @@ class User extends Authenticatable
     public function reports(): HasMany
     {
         return $this->hasMany(Report::class);
+    }
+
+    // Accessor untuk mendapatkan 'name' dari kolom 'nama'
+    public function getNameAttribute(): string
+    {
+        return $this->attributes['nama'] ?? '';
     }
 }

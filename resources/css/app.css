@@ -3034,3 +3034,931 @@ body {
 .user-dropdown-menu .dropdown-item.logout:hover {
     background-color: #fee2e2;
 }
+/* Styling for alerts, etc. (same as login.blade.php) */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+}
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert-danger ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+
+/* Basic styling for the register page */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f4f8;
+    padding: 2rem;
+}
+.register-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for form and image */
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 900px;
+    width: 100%;
+}
+@media (max-width: 768px) {
+    .register-content {
+        grid-template-columns: 1fr;
+    }
+    .register-image-section {
+        display: none; /* Hide image on small screens */
+    }
+}
+.register-section {
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.register-image-section {
+    background-size: cover;
+    background-position: center;
+}
+.register-form-container {
+    width: 100%;
+}
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.form-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+.form-subtitle {
+    font-size: 1rem;
+    color: #666;
+}
+.register-form .form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+.register-form .form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.register-form .form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    box-sizing: border-box; /* Include padding in element's total width */
+}
+.register-form .form-input:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+.register-button {
+    width: 100%;
+    padding: 1rem;
+    background-color: #22c55e;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1.5rem;
+}
+.register-button:hover {
+    background-color: #1a924a;
+}
+.login-link {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #666;
+}
+.login-link-text {
+    color: #22c55e;
+    text-decoration: none;
+    font-weight: 600;
+}
+.login-link-text:hover {
+    text-decoration: underline;
+}
+/* --- Authentication Pages (Login & Register) --- */
+
+/* Main Container for Auth Pages */
+.auth-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--gray-50); /* Background abu-abu muda */
+    padding: 2rem;
+}
+
+/* Wrapper for two-column content */
+.auth-content-wrapper {
+    background-color: var(--white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-lg); /* Shadow yang lebih menonjol */
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Sisi kiri sedikit lebih lebar */
+    max-width: 1000px; /* Ukuran total wrapper */
+    width: 100%;
+}
+
+/* Responsive adjustment */
+@media (max-width: 992px) {
+    .auth-content-wrapper {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+        max-width: 500px; /* Lebar tunggal untuk form */
+    }
+}
+
+/* Left Section: Greeting and Features */
+.auth-greeting-section {
+    background-color: #f0fdf4; /* Warna latar belakang hijau muda */
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Untuk mendorong "Kembali" ke bawah */
+    align-items: flex-start; /* Konten rata kiri */
+    color: var(--gray-800);
+}
+
+.auth-logo-link {
+    display: block;
+    margin-bottom: 2.5rem; /* Jarak antara logo dan judul */
+}
+
+.auth-logo-img {
+    height: 55px; /* Ukuran logo */
+    width: auto;
+}
+
+.greeting-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: var(--gray-900);
+}
+
+.greeting-subtitle {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--gray-600);
+    margin-bottom: 3rem; /* Jarak sebelum daftar fitur */
+}
+
+.auth-feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    margin-bottom: 3rem; /* Jarak sebelum tombol kembali */
+}
+
+.auth-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--white);
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.auth-feature-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.auth-feature-icon {
+    width: 45px; /* Ukuran kotak ikon */
+    height: 45px;
+    border-radius: 0.5rem;
+    background-color: #dcfce7; /* Latar belakang icon hijau muda */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0; /* Mencegah ikon menyusut */
+}
+.auth-feature-icon img {
+    max-width: 100%; /* Pastikan gambar ikon pas di kotak */
+    max-height: 100%;
+}
+
+.auth-feature-text {
+    font-size: 0.95rem;
+    color: var(--gray-700);
+    line-height: 1.4;
+}
+.auth-feature-text strong {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.auth-back-link {
+    text-align: left;
+    width: 100%; /* Untuk memastikan link rata kiri */
+}
+.auth-back-link a {
+    color: var(--gray-600);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.auth-back-link a:hover {
+    color: var(--primary-green);
+}
+.auth-back-link svg {
+    vertical-align: middle;
+    margin-right: 5px;
+    color: var(--gray-600); /* Warna ikon panah */
+}
+.auth-back-link a:hover svg {
+    color: var(--primary-green);
+}
+
+/* Right Section: Form Container */
+.auth-form-section {
+    padding: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--white);
+}
+
+.auth-form-inner-wrapper {
+    width: 100%;
+    max-width: 400px; /* Batasi lebar form di sisi kanan */
+    text-align: center;
+}
+
+.form-main-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.75rem;
+}
+
+.form-main-subtitle {
+    font-size: 1rem;
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* General Form Elements (Re-use existing classes if possible) */
+/* Pastikan ini tidak duplikasi dengan .form-group/.form-label/.form-input di bagian lain app.css */
+/* Jika sudah ada, hapus dari sini */
+.form-group {
+    margin-bottom: 0; /* Override default margin jika dibutuhkan */
+    text-align: left; /* Ensure labels are left-aligned */
+}
+.form-label {
+    font-size: 0.9rem;
+    color: var(--gray-700);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block; /* Ensure label is on its own line */
+}
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: var(--gray-800);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; /* Include padding in width */
+    background-color: var(--white);
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* Checkbox (Remember me) */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 1rem; /* Jarak sebelum tombol utama */
+}
+.checkbox-container { /* Re-use from global app.css if similar */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-600);
+    cursor: pointer;
+}
+.checkbox-container input[type="checkbox"] {
+    accent-color: var(--primary-green);
+    width: 1.1rem;
+    height: 1.1rem;
+}
+.forgot-password { /* Re-use from global app.css if similar */
+    color: var(--primary-green);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.forgot-password:hover {
+    color: #16a34a;
+}
+
+/* Auth Buttons (Login/Register) */
+.auth-button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    border: none; /* Default for buttons */
+}
+.auth-button.primary {
+    background-color: var(--primary-green);
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+.auth-button.primary:hover {
+    background-color: #16a34a;
+    box-shadow: var(--shadow-lg);
+}
+/* If you need a secondary button (like "Daftar" if it were a button) */
+.auth-button.secondary {
+    background-color: var(--gray-100);
+    color: var(--gray-800);
+    border: 1px solid var(--gray-300);
+}
+.auth-button.secondary:hover {
+    background-color: var(--gray-200);
+}
+
+/* Link at the bottom of the form */
+.auth-link-bottom {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    margin-top: 2rem; /* Jarak dari tombol */
+}
+.auth-link-text {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+}
+.auth-link-text:hover {
+    text-decoration: underline;
+}
+
+/* Alert messages (Error/Success) */
+/* Pastikan ini tidak duplikasi dengan .alert/.alert-danger di bagian lain app.css */
+/* Jika sudah ada, hapus dari sini */
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    margin-bottom: 1.5rem; /* Consistent margin */
+}
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert-danger ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+/* --- Responsive Adjustments for Auth Pages --- */
+@media (max-width: 768px) {
+    .auth-greeting-section {
+        padding: 2rem; /* Kurangi padding di layar kecil */
+    }
+    .auth-logo-link {
+        margin-bottom: 1.5rem;
+    }
+    .greeting-title {
+        font-size: 2rem;
+    }
+    .greeting-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+    .auth-feature-list {
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .auth-feature-item {
+        padding: 0.8rem 1rem;
+    }
+    .auth-feature-text {
+        font-size: 0.85rem;
+    }
+    .auth-back-link {
+        margin-top: 1.5rem;
+        text-align: center; /* Center back link on small screens */
+    }
+
+    .auth-form-section {
+        padding: 2.5rem; /* Kurangi padding di layar kecil */
+    }
+    .form-main-title {
+        font-size: 1.8rem;
+    }
+    .form-main-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+    .auth-form {
+        gap: 1rem;
+    }
+    .form-options {
+        font-size: 0.85rem;
+    }
+    .auth-link-bottom {
+        font-size: 0.85rem;
+        margin-top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-page-container {
+        padding: 1rem;
+    }
+    .auth-content-wrapper {
+        border-radius: 0.75rem;
+    }
+    .auth-greeting-section, .auth-form-section {
+        padding: 1.5rem;
+    }
+    .auth-logo-img {
+        height: 40px;
+    }
+    .greeting-title {
+        font-size: 1.8rem;
+    }
+    .greeting-subtitle {
+        font-size: 0.85rem;
+    }
+    .auth-feature-icon {
+        width: 35px;
+        height: 35px;
+    }
+    .auth-feature-text {
+        font-size: 0.8rem;
+    }
+    .auth-form-inner-wrapper {
+        max-width: 300px;
+    }
+    .form-main-title {
+        font-size: 1.6rem;
+    }
+    .auth-button {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+}
+
+/* --- Authentication Pages (Login & Register) --- */
+
+/* Main Container for Auth Pages */
+.auth-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--gray-50); /* Background abu-abu muda */
+    padding: 2rem;
+}
+
+/* Wrapper for two-column content */
+.auth-content-wrapper {
+    background-color: var(--white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-lg); /* Shadow yang lebih menonjol */
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Sisi kiri sedikit lebih lebar */
+    max-width: 1000px; /* Ukuran total wrapper */
+    width: 100%;
+}
+
+/* Responsive adjustment */
+@media (max-width: 992px) {
+    .auth-content-wrapper {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+        max-width: 500px; /* Lebar tunggal untuk form */
+    }
+}
+
+/* Left Section: Greeting and Features */
+.auth-greeting-section {
+    background-color: #f0fdf4; /* Warna latar belakang hijau muda */
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Untuk mendorong "Kembali" ke bawah */
+    align-items: flex-start; /* Konten rata kiri */
+    color: var(--gray-800);
+}
+
+.auth-logo-link {
+    display: block;
+    margin-bottom: 2.5rem; /* Jarak antara logo dan judul */
+}
+
+.auth-logo-img {
+    height: 55px; /* Ukuran logo */
+    width: auto;
+}
+
+.greeting-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: var(--gray-900);
+}
+
+.greeting-subtitle {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--gray-600);
+    margin-bottom: 3rem; /* Jarak sebelum daftar fitur */
+}
+
+.auth-feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    margin-bottom: 3rem; /* Jarak sebelum tombol kembali */
+}
+
+.auth-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--white);
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.auth-feature-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.auth-feature-icon {
+    width: 45px; /* Ukuran kotak ikon */
+    height: 45px;
+    border-radius: 0.5rem;
+    background-color: #dcfce7; /* Latar belakang icon hijau muda */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0; /* Mencegah ikon menyusut */
+}
+.auth-feature-icon img {
+    max-width: 100%; /* Pastikan gambar ikon pas di kotak */
+    max-height: 100%;
+}
+
+.auth-feature-text {
+    font-size: 0.95rem;
+    color: var(--gray-700);
+    line-height: 1.4;
+}
+.auth-feature-text strong {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.auth-back-link {
+    text-align: left;
+    width: 100%; /* Untuk memastikan link rata kiri */
+}
+.auth-back-link a {
+    color: var(--gray-600);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.auth-back-link a:hover {
+    color: var(--primary-green);
+}
+.auth-back-link svg {
+    vertical-align: middle;
+    margin-right: 5px;
+    color: var(--gray-600); /* Warna ikon panah */
+}
+.auth-back-link a:hover svg {
+    color: var(--primary-green);
+}
+
+/* Right Section: Form Container */
+.auth-form-section {
+    padding: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--white);
+}
+
+.auth-form-inner-wrapper {
+    width: 100%;
+    max-width: 400px; /* Batasi lebar form di sisi kanan */
+    text-align: center;
+}
+
+.form-main-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 0.75rem;
+}
+
+.form-main-subtitle {
+    font-size: 1rem;
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* General Form Elements (Re-use existing classes if possible) */
+/* Pastikan ini tidak duplikasi dengan .form-group/.form-label/.form-input di bagian lain app.css */
+/* Jika sudah ada, hapus dari sini */
+.form-group {
+    margin-bottom: 0; /* Override default margin jika dibutuhkan */
+    text-align: left; /* Ensure labels are left-aligned */
+}
+.form-label {
+    font-size: 0.9rem;
+    color: var(--gray-700);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block; /* Ensure label is on its own line */
+}
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: var(--gray-800);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; /* Include padding in width */
+    background-color: var(--white);
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* Checkbox (Remember me) */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 1rem; /* Jarak sebelum tombol utama */
+}
+.checkbox-container { /* Re-use from global app.css if similar */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-600);
+    cursor: pointer;
+}
+.checkbox-container input[type="checkbox"] {
+    accent-color: var(--primary-green);
+    width: 1.1rem;
+    height: 1.1rem;
+}
+.forgot-password { /* Re-use from global app.css if similar */
+    color: var(--primary-green);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.forgot-password:hover {
+    color: #16a34a;
+}
+
+/* Auth Buttons (Login/Register) */
+.auth-button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    border: none; /* Default for buttons */
+}
+.auth-button.primary {
+    background-color: var(--primary-green);
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+.auth-button.primary:hover {
+    background-color: #16a34a;
+    box-shadow: var(--shadow-lg);
+}
+/* If you need a secondary button (like "Daftar" if it were a button) */
+.auth-button.secondary {
+    background-color: var(--gray-100);
+    color: var(--gray-800);
+    border: 1px solid var(--gray-300);
+}
+.auth-button.secondary:hover {
+    background-color: var(--gray-200);
+}
+
+/* Link at the bottom of the form */
+.auth-link-bottom {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    margin-top: 2rem; /* Jarak dari tombol */
+}
+.auth-link-text {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+}
+.auth-link-text:hover {
+    text-decoration: underline;
+}
+
+/* Alert messages (Error/Success) */
+/* Pastikan ini tidak duplikasi dengan .alert/.alert-danger di bagian lain app.css */
+/* Jika sudah ada, hapus dari sini */
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    margin-bottom: 1.5rem; /* Consistent margin */
+}
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+.alert-danger ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+/* --- Responsive Adjustments for Auth Pages --- */
+@media (max-width: 768px) {
+    .auth-greeting-section {
+        padding: 2rem; /* Kurangi padding di layar kecil */
+    }
+    .auth-logo-link {
+        margin-bottom: 1.5rem;
+    }
+    .greeting-title {
+        font-size: 2rem;
+    }
+    .greeting-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+    .auth-feature-list {
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .auth-feature-item {
+        padding: 0.8rem 1rem;
+    }
+    .auth-feature-text {
+        font-size: 0.85rem;
+    }
+    .auth-back-link {
+        margin-top: 1.5rem;
+        text-align: center; /* Center back link on small screens */
+    }
+
+    .auth-form-section {
+        padding: 2.5rem; /* Kurangi padding di layar kecil */
+    }
+    .form-main-title {
+        font-size: 1.8rem;
+    }
+    .form-main-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+    .auth-form {
+        gap: 1rem;
+    }
+    .form-options {
+        font-size: 0.85rem;
+    }
+    .auth-link-bottom {
+        font-size: 0.85rem;
+        margin-top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-page-container {
+        padding: 1rem;
+    }
+    .auth-content-wrapper {
+        border-radius: 0.75rem;
+    }
+    .auth-greeting-section, .auth-form-section {
+        padding: 1.5rem;
+    }
+    .auth-logo-img {
+        height: 40px;
+    }
+    .greeting-title {
+        font-size: 1.8rem;
+    }
+    .greeting-subtitle {
+        font-size: 0.85rem;
+    }
+    .auth-feature-icon {
+        width: 35px;
+        height: 35px;
+    }
+    .auth-feature-text {
+        font-size: 0.8rem;
+    }
+    .auth-form-inner-wrapper {
+        max-width: 300px;
+    }
+    .form-main-title {
+        font-size: 1.6rem;
+    }
+    .auth-button {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+}
+/* Pastikan bagian ini ada di app.css Anda */
+/* --- Authentication Pages (Login & Register) --- */
+
+/* ... (Gaya lainnya di atas) ... */
+
+/* General Form Elements */
+/* Pastikan bagian ini ada dan propertinya sesuai */
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid black !important; /* <<< UBAH KE BLACK DAN TETAPKAN !important SEMENTARA */
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: var(--gray-800);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+    background-color: var(--white);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* ... (Gaya lainnya di bawah) ... */
