@@ -33,20 +33,36 @@ Route::get('/register', function () {
 })->name('register')->middleware('guest');
 
 
-// =======================================================
-// === ALUR PEMBUATAN LAPORAN ===
-// =======================================================
-Route::get('/laporan/buat', [ReportController::class, 'createStep1'])->name('reports.create')->middleware('auth');
-Route::post('/laporan/buat/step2', [ReportController::class, 'postStep1'])->name('reports.create.step1.post')->middleware('auth');
-Route::get('/laporan/buat/detail-lokasi', [ReportController::class, 'createStep2'])->name('reports.create.step2')->middleware('auth');
-Route::post('/laporan/buat/step3', [ReportController::class, 'postStep2'])->name('reports.create.step2.post')->middleware('auth');
-Route::get('/laporan/buat/deskripsi', [ReportController::class, 'createStep3'])->name('reports.create.step3')->middleware('auth');
-Route::post('/laporan/buat/step4', [ReportController::class, 'postStep3'])->name('reports.create.step3.post')->middleware('auth');
-Route::get('/laporan/buat/konfirmasi', [ReportController::class, 'createStep4'])->name('reports.create.step4')->middleware('auth');
-Route::post('/laporan/kirim', [ReportController::class, 'store'])->name('reports.store')->middleware('auth');
-Route::get('/laporan/sukses', function () { return view('reports.success'); })->name('reports.success')->middleware('auth');
 
 
+// =======================================================
+// === ALUR PEMBUATAN LAPORAN (MULTI-STEP DINAMIS) ===
+// =======================================================
+
+// Langkah 1: Menampilkan & Memproses form awal
+Route::get('/laporan/buat', [ReportController::class, 'createStep1'])->name('reports.create');
+Route::post('/laporan/buat', [ReportController::class, 'postStep1'])->name('reports.create.step1.post');
+
+// Langkah 2: Menampilkan & Memproses form detail lokasi
+Route::get('/laporan/buat/detail-lokasi', [ReportController::class, 'createStep2'])->name('reports.create.step2');
+Route::post('/laporan/buat/detail-lokasi', [ReportController::class, 'postStep2'])->name('reports.create.step2.post');
+
+// Langkah 3: Menampilkan & Memproses form deskripsi & foto
+Route::get('/laporan/buat/deskripsi', [ReportController::class, 'createStep3'])->name('reports.create.step3');
+Route::post('/laporan/buat/deskripsi', [ReportController::class, 'postStep3'])->name('reports.create.step3.post');
+
+// Langkah 4: Menampilkan halaman konfirmasi
+Route::get('/laporan/buat/konfirmasi', [ReportController::class, 'createStep4'])->name('reports.create.step4');
+
+// Logika untuk menyimpan laporan ke database
+Route::post('/laporan/kirim', [ReportController::class, 'store'])->name('reports.store');
+
+// Halaman sukses setelah laporan terkirim
+Route::get('/laporan/sukses', function () {
+    return view('reports.success');
+})->name('reports.success');
+
+// ... (Sisa route Anda)
 // =======================================================
 // === ALUR MELIHAT LAPORAN & EDUKASI ===
 // =======================================================
