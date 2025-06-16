@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\RegisterController as CustomRegisterController; // Import Controller Register kustom Anda
+use App\Http\Controllers\Auth\RegisterController as CustomRegisterController;
+use App\Http\Controllers\DinasController; // <<< TAMBAHKAN INI
 
 /*
 |--------------------------------------------------------------------------
@@ -118,6 +119,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Dashboard Admin
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+    // Pengelolaan Laporan (Admin menyetujui laporan untuk dinas)
+    Route::get('/reports/pending-approval', [AdminController::class, 'pendingApprovalReports'])->name('reports.pending_approval');
+    Route::post('/reports/{id}/approve', [AdminController::class, 'approveReport'])->name('reports.approve');
+    Route::post('/reports/{id}/reject-admin', [AdminController::class, 'rejectReportByAdmin'])->name('reports.reject_admin'); // Jika ada penolakan oleh admin
+
     // Pengelolaan Edukasi (Admin saja yang bisa)
     Route::get('/education', [AdminController::class, 'educationIndex'])->name('education.index');
     Route::get('/education/create', [AdminController::class, 'createEducation'])->name('education.create');
@@ -125,4 +131,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/education/{id}/edit', [AdminController::class, 'editEducation'])->name('education.edit');
     Route::put('/education/{id}', [AdminController::class, 'updateEducation'])->name('education.update');
     Route::delete('/education/{id}', [AdminController::class, 'destroyEducation'])->name('education.destroy');
+});
+
+
+// =======================================================
+// === HALAMAN DINAS (Dilindungi Middleware 'auth' dan 'dinas') ===
+// =======================================================
+Route::middleware(['auth', 'dinas'])->prefix('dinas')->name('dinas.')->group(function () {
+    Route::get('/dashboard', [DinasController::class, 'dashboard'])->name('dashboard');
+    Route::get('/reports/{id}', [DinasController::class, 'showReport'])->name('show.report');
+    Route::post('/reports/{id}/update-status', [DinasController::class, 'updateReportStatus'])->name('update_status');
 });

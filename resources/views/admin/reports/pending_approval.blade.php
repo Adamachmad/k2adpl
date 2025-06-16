@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Dinas - EcoWatch')
-@section('description', 'Halaman dashboard untuk Pihak Dinas Terkait untuk menindaklanjuti laporan yang disetujui.')
+@section('title', 'Persetujuan Laporan - Admin EcoWatch')
+@section('description', 'Halaman admin untuk meninjau dan menyetujui laporan sebelum diteruskan ke dinas.')
 
 @section('content')
 <div class="page-container">
     <div class="page-header">
         <div class="container">
-            <h1 class="page-title-alt">Dashboard Dinas</h1>
-            <p class="page-subtitle-alt">Lihat dan tindak lanjuti laporan kerusakan lingkungan yang telah disetujui oleh admin.</p>
+            <h1 class="page-title-alt">Laporan Menunggu Persetujuan Admin</h1>
+            <p class="page-subtitle-alt">Tinjau laporan yang masuk dan setujui untuk diteruskan ke Pihak Dinas Terkait.</p>
         </div>
     </div>
 
@@ -20,13 +20,13 @@
                 </div>
             @endif
 
-            <h2 class="section-heading-alt" style="margin-top: 0;">Laporan Menunggu Tindak Lanjut</h2>
+            <h2 class="section-heading-alt" style="margin-top: 0;">Daftar Laporan</h2>
 
             <div class="report-list">
                 @forelse($reports as $report)
                     <div class="report-list-item">
                         @php
-                        $photos = $report->fotoBukti;
+                       $photos = $report->fotoBukti;
                         $firstPhotoUrl = ($photos && is_array($photos) && !empty($photos)) ? asset('storage/' . $photos[0]) : asset('img/placeholder.jpg');
                         @endphp
                         <img src="{{ $firstPhotoUrl }}" alt="{{ $report->judul }}" class="report-item-img">
@@ -40,13 +40,22 @@
                             <p class="report-item-date">Dilaporkan pada: {{ $report->created_at->format('d F Y') }}</p>
                             <p class="report-item-date">ID Laporan: {{ $report->id }}</p>
                         </div>
-                        <a href="{{ route('dinas.show.report', $report->id) }}" class="btn-detail">Tindak Lanjut →</a>
+                        <div class="report-footer" style="border-top: none; padding-top: 0; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
+                            <form action="{{ route('admin.reports.approve', $report->id) }}" method="POST" style="width: 100%;">
+                                @csrf
+                                <button type="submit" class="btn-primary" style="width: 100%; padding: 0.75rem 1rem;">Setujui → Dinas</button>
+                            </form>
+                            <form action="{{ route('admin.reports.reject_admin', $report->id) }}" method="POST" style="width: 100%;">
+                                @csrf
+                                <button type="submit" class="btn-secondary" style="width: 100%; padding: 0.75rem 1rem; background-color: #ef4444; color: white;">Tolak</button>
+                            </form>
+                        </div>
                     </div>
                 @empty
                     <div class="empty-state">
                         <img src="{{ asset('img/empty-state.svg') }}" alt="Tidak ada laporan" class="empty-state-img">
-                        <h2 class="empty-state-title">Tidak Ada Laporan Menunggu Tindak Lanjut</h2>
-                        <p class="empty-state-text">Saat ini belum ada laporan yang disetujui admin untuk ditindaklanjuti oleh dinas.</p>
+                        <h2 class="empty-state-title">Tidak Ada Laporan Menunggu Persetujuan</h2>
+                        <p class="empty-state-text">Semua laporan yang masuk telah ditinjau atau tidak ada laporan baru.</p>
                     </div>
                 @endforelse
             </div>

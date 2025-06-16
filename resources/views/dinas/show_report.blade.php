@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Laporan - EcoWatch')
-@section('description', 'Lihat detail lengkap laporan, foto, dan diskusi komunitas terkait masalah lingkungan ini.')
+@section('title', 'Detail Laporan Dinas - EcoWatch')
+@section('description', 'Lihat detail laporan dan perbarui status oleh Pihak Dinas Terkait.')
 
 @section('content')
 <div class="page-container">
@@ -12,23 +12,19 @@
                     <span class="report-item-category">{{ $report->category ?? 'Umum' }}</span>
                     <h1 class="detail-title">{{ $report->judul }}</h1>
                     <div class="detail-meta">
-                        {{-- Asumsi 'reporter' belum ada di model Report, bisa diganti dengan Auth::user()->name jika laporan milik sendiri --}}
-                        <span>Dilaporkan oleh <strong>{{ $report->user->name ?? 'Pengguna Anonim' }}</strong> pada {{ $report->created_at->format('d F Y') }}</span>
+                        <span>Dilaporkan oleh <strong>{{ $report->user->nama ?? 'Pengguna Anonim' }}</strong> pada {{ $report->created_at->format('d F Y') }}</span>
                         <span class="status-badge {{ strtolower($report->status) }}">{{ $report->status }}</span>
-                        {{-- Tambahkan ID Laporan --}}
                         <span class="report-id">ID Laporan: {{ $report->id }}</span>
                     </div>
                 </div>
+
                 <div class="photo-gallery">
                     @php
-                        // Decode JSON string dari fotoBukti menjadi array
                     $photos = $report->fotoBukti;
                     @endphp
 
                     @if ($photos && is_array($photos) && !empty($photos))
-                        {{-- Menampilkan foto utama (yang pertama dari array) --}}
                         <img src="{{ asset('storage/' . $photos[0]) }}" alt="Foto Laporan Utama" class="main-photo">
-                        {{-- Jika ada lebih dari satu foto, tampilkan thumbnailnya --}}
                         @if (count($photos) > 1)
                             <div class="thumbnail-gallery">
                                 @foreach ($photos as $index => $photo)
@@ -39,16 +35,36 @@
                             </div>
                         @endif
                     @else
-                        {{-- Placeholder jika tidak ada foto --}}
                         <img src="{{ asset('img/placeholder.jpg') }}" alt="Tidak ada foto" class="main-photo">
                         <p class="text-center mt-3">Tidak ada foto terlampir untuk laporan ini.</p>
                     @endif
                 </div>
+
                 <div class="detail-description-box">
                     <h3 class="section-heading">Deskripsi Laporan</h3>
                     <p>{{ $report->deskripsi }}</p>
                 </div>
-                <div class="comments-section">
+                
+                {{-- Form Update Status oleh Dinas --}}
+                <div class="update-status-section" style="background: #f8f8f8; padding: 1.5rem; border-radius: 0.75rem; margin-top: 2rem;">
+                    <h3 class="section-heading" style="margin-top: 0; border-bottom: none; padding-bottom: 0;">Perbarui Status Laporan</h3>
+                    <form action="{{ route('dinas.update_status', $report->id) }}" method="POST">
+                        @csrf
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label for="status" class="form-label" style="margin-bottom: 0.5rem;">Pilih Status Baru:</label>
+                            <select name="status" id="status" class="form-input" style="width: auto; display: inline-block;">
+                                <option value="DITUNDA" {{ $report->status == 'DITUNDA' ? 'selected' : '' }}>DITUNDA</option>
+                                <option value="DIPROSES" {{ $report->status == 'DIPROSES' ? 'selected' : '' }}>DIPROSES</option>
+                                <option value="SELESAI" {{ $report->status == 'SELESAI' ? 'selected' : '' }}>SELESAI</option>
+                                <option value="DITOLAK" {{ $report->status == 'DITOLAK' ? 'selected' : '' }}>DITOLAK</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Update Status</button>
+                    </form>
+                </div>
+                
+                {{-- Bagian Diskusi & Komentar --}}
+                <div class="comments-section" style="margin-top: 2rem;">
                     <h3 class="section-heading">Diskusi & Komentar (2)</h3>
                     <div class="comment-form">
                         <img src="https://i.pravatar.cc/40?u=user1" alt="Avatar Anda" class="comment-avatar">
@@ -79,6 +95,7 @@
                     </div>
                 </div>
             </div>
+
             <aside class="report-sidebar">
                 <div class="sidebar-widget">
                     <h4 class="widget-title">Lokasi Kejadian</h4>

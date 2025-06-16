@@ -63,6 +63,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'admin' => \App\Http\Middleware\AdminMiddleware::class, // <<< TAMBAHKAN BARIS INI
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'dinas' => \App\Http\Middleware\DinasMiddleware::class, // <<< TAMBAHKAN BARIS INI UNTUK DINAS MIDDLEWARE
     ];
 }

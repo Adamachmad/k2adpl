@@ -22,6 +22,18 @@ class Report extends Model
         'lokasi',
         'fotoBukti',
         'status',
+        'category',           // <<< TAMBAHKAN INI
+        'is_approved_by_admin', // <<< TAMBAHKAN INI
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'fotoBukti' => 'array',             // <<< TAMBAHKAN INI (penting untuk mengakses path foto)
+        'is_approved_by_admin' => 'boolean', // <<< TAMBAHKAN INI
     ];
 
     /**

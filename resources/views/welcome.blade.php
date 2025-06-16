@@ -76,7 +76,8 @@
             @forelse($recentReports as $report)
                 <div class="report-card">
                     @php
-                        $photos = json_decode($report->fotoBukti);
+                        // HAPUS json_decode() DI SINI
+                        $photos = $report->fotoBukti; // fotoBukti sudah berupa array karena cast di Model Report
                         $firstPhotoUrl = ($photos && is_array($photos) && !empty($photos)) ? asset('storage/' . $photos[0]) : asset('img/placeholder.jpg');
                     @endphp
                     <img src="{{ $firstPhotoUrl }}" alt="{{ $report->judul }}" class="report-image" loading="lazy">

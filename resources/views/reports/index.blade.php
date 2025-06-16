@@ -27,8 +27,8 @@
                 @forelse($reports as $report)
                 <div class="report-list-item">
                     @php
-                    // Mengambil foto pertama dari array JSON di kolom fotoBukti
-                    $photos = json_decode($report->fotoBukti);
+                    // Mengambil foto pertama dari array di kolom fotoBukti
+                    $photos = $report->fotoBukti;
                     // Pastikan $photos adalah array dan tidak kosong, jika tidak gunakan placeholder
                     $firstPhotoUrl = ($photos && is_array($photos) && !empty($photos)) ? asset('storage/' . $photos[0]) : asset('img/placeholder.jpg');
                     @endphp
