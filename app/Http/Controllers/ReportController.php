@@ -9,8 +9,8 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Hash; // <<< PASTIKAN INI DI-IMPORT UNTUK HASH::CHECK
+use Illuminate\Validation\ValidationException; // Pastikan ini di-import
+use Illuminate\Support\Facades\Hash; // PASTIKAN INI DI-IMPORT UNTUK HASH::CHECK
 
 class ReportController extends Controller
 {
@@ -223,7 +223,7 @@ class ReportController extends Controller
      * Menampilkan form login.
      * @return \Illuminate\View\View
      */
-    public function showLoginForm(): View // <<< METODE INI SUDAH ADA
+    public function showLoginForm(): View
     {
         return view('auth.login');
     }
@@ -248,13 +248,23 @@ class ReportController extends Controller
         if ($user && Hash::check($credentials['password'], $user->password)) {
             Auth::login($user, $request->has('remember')); // Login user, dengan "ingat saya" jika dicentang
             $request->session()->regenerate();
-            return redirect()->intended(route('home'));
+
+            // --- LOGIKA REDIRECT BERDASARKAN ROLE ---
+            if ($user->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
+            } elseif ($user->role === 'dinas') {
+                return redirect()->intended(route('dinas.dashboard'));
+            } else { // 'user' atau role lainnya
+                return redirect()->intended(route('home'));
+            }
+            // --- AKHIR LOGIKA REDIRECT ---
         }
 
         // Jika login gagal, lemparkan exception dengan pesan error
+        // Ini adalah perbaikan untuk "Call to undefined method Illuminate\Validation\ValidationException::onlyInput()"
         throw ValidationException::withMessages([
             'email' => 'Email atau password yang Anda masukkan tidak sesuai.',
-        ])->onlyInput('email');
+        ]);
     }
 
     /**
