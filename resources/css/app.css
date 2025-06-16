@@ -3960,5 +3960,123 @@ body {
     border-color: var(--primary-green);
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
+/* --- Admin Dashboard Styles --- */
 
-/* ... (Gaya lainnya di bawah) ... */
+/* ... (Gaya stats-grid dan stat-card) ... */
+
+.dashboard-table-container { /* Kontainer yang membungkus aksi cepat dan tabel */
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-quick-actions { /* Wrapper untuk tombol aksi cepat */
+    display: flex;
+    gap: 1rem; /* Jarak antar tombol */
+    flex-wrap: wrap; /* Agar tombol bisa wrap di layar kecil */
+    margin-bottom: 2rem; /* Jarak sebelum heading berikutnya */
+}
+
+.admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap; /* Mencegah teks pecah baris */
+    box-shadow: var(--shadow-sm); /* Tambahkan shadow */
+}
+
+/* Warna spesifik untuk tombol admin */
+.admin-action-btn.primary-blue {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border: 1px solid var(--primary-blue);
+}
+.admin-action-btn.primary-blue:hover {
+    background-color: #2563eb; /* Sedikit lebih gelap */
+    box-shadow: var(--shadow-md);
+}
+
+.admin-action-btn.primary-green {
+    background-color: var(--primary-green);
+    color: var(--white);
+    border: 1px solid var(--primary-green);
+}
+.admin-action-btn.primary-green:hover {
+    background-color: #16a34a; /* Sedikit lebih gelap */
+    box-shadow: var(--shadow-md);
+}
+/* --- Admin Dashboard Styles --- */
+
+/* ... (Gaya stats-grid dan stat-card di atasnya) ... */
+
+.dashboard-table-container { /* Kontainer yang membungkus aksi cepat dan tabel */
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-quick-actions { /* Wrapper untuk tombol aksi cepat */
+    display: flex;
+    gap: 1rem; /* Jarak antar tombol */
+    flex-wrap: wrap; /* Agar tombol bisa wrap di layar kecil */
+    margin-bottom: 2rem; /* Jarak sebelum heading berikutnya */
+    justify-content: flex-start; /* Agar tombol tidak melebar penuh jika ada ruang */
+    align-items: center;
+}
+
+.admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap; /* Mencegah teks pecah baris */
+    box-shadow: var(--shadow-sm); /* Tambahkan shadow */
+    min-width: 180px; /* Berikan lebar minimum agar konsisten */
+}
+
+/* Warna spesifik untuk tombol admin */
+.admin-action-btn.primary-blue {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border: 1px solid var(--primary-blue);
+}
+.admin-action-btn.primary-blue:hover {
+    background-color: #2563eb; /* Sedikit lebih gelap */
+    box-shadow: var(--shadow-md);
+}
+
+.admin-action-btn.primary-green {
+    background-color: var(--primary-green);
+    color: var(--white);
+    border: 1px solid var(--primary-green);
+}
+.admin-action-btn.primary-green:hover {
+    background-color: #16a34a; /* Sedikit lebih gelap */
+    box-shadow: var(--shadow-md);
+}
+
+/* Responsive adjustments for quick actions */
+@media (max-width: 768px) {
+    .admin-quick-actions {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: stretch; /* Make them full width */
+    }
+    .admin-action-btn {
+        width: 100%; /* Ensure full width when stacked */
+    }
+}
+
+/* ... (Sisa gaya admin dashboard di bawah) ... */

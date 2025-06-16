@@ -20,7 +20,7 @@
 
                 <div class="photo-gallery">
                     @php
-                    $photos = $report->fotoBukti;
+                        $photos = $report->fotoBukti; // Sudah di-cast ke array di model Report
                     @endphp
 
                     @if ($photos && is_array($photos) && !empty($photos))

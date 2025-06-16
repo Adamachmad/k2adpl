@@ -26,7 +26,7 @@
                 @forelse($reports as $report)
                     <div class="report-list-item">
                         @php
-                        $photos = $report->fotoBukti;
+                        $photos = $report->fotoBukti; // Sudah di-cast ke array di model Report
                         $firstPhotoUrl = ($photos && is_array($photos) && !empty($photos)) ? asset('storage/' . $photos[0]) : asset('img/placeholder.jpg');
                         @endphp
                         <img src="{{ $firstPhotoUrl }}" alt="{{ $report->judul }}" class="report-item-img">
