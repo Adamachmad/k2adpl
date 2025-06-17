@@ -11,25 +11,25 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up(): void
+public function up()
 {
     Schema::create('reports', function (Blueprint $table) {
-        $table->id(); // Ini adalah 'laporanId' Anda
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-        // Kolom ini menghubungkan setiap laporan ke seorang user.
-        // Jika user dihapus, semua laporannya juga akan ikut terhapus (onDelete('cascade')).
-        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+        $table->string('judul')->nullable(); // <-- Tambahkan ->nullable()
+        $table->text('deskripsi')->nullable(); // <-- Tambahkan ->nullable()
+        $table->text('lokasi')->nullable(); // <-- Tambahkan ->nullable()
+        $table->json('fotoBukti')->nullable(); // <-- Ubah ke json() dan tambahkan ->nullable()
 
-        $table->string('judul');
-        $table->text('deskripsi');
-        $table->string('lokasi');
-        $table->string('fotoBukti'); // Kita akan simpan path/nama file fotonya di sini
+        // Kolom di bawah ini tidak perlu diubah
+        $table->string('category');
+        $table->string('status')->default('DRAFT');
 
-        // Kolom 'status' dengan nilai default 'DITUNDA' sesuai diagram Anda
-        $table->enum('status', ['DITUNDA', 'DISETUJUI', 'DITOLAK', 'DIPROSES', 'SELESAI'])->default('DITUNDA');
+        $table->timestamps();
 
-        // Ini sudah mencakup 'laporanDibuat' (created_at) dan 'tanggalUpdate' (updated_at)
-        $table->timestamps(); 
+        // Tambahan dari file Anda, ini sudah benar
+        $table->boolean('is_approved_by_admin')->default(false); 
     });
 }
 

@@ -22,8 +22,8 @@ class Report extends Model
         'lokasi',
         'fotoBukti',
         'status',
-        'category',           // <<< TAMBAHKAN INI
-        'is_approved_by_admin', // <<< TAMBAHKAN INI
+        'category',
+        'is_approved_by_admin',
     ];
 
     /**
@@ -32,8 +32,8 @@ class Report extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'fotoBukti' => 'array',             // <<< TAMBAHKAN INI (penting untuk mengakses path foto)
-        'is_approved_by_admin' => 'boolean', // <<< TAMBAHKAN INI
+        'fotoBukti' => 'array',
+        'is_approved_by_admin' => 'boolean',
     ];
 
     /**
