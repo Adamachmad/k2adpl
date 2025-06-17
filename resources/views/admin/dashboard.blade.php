@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app') {{-- Atau layouts.admin jika Anda punya layout khusus admin --}}
 
 @section('title', 'Dashboard Admin - EcoWatch')
 @section('description', 'Halaman dashboard untuk pengelolaan sistem EcoWatch.')
@@ -8,13 +8,13 @@
     <div class="page-header">
         <div class="container">
             <h1 class="page-title-alt">Admin Dashboard</h1>
-            {{-- Menggunakan Auth::user()->nama sesuai database Anda --}}
             <p class="page-subtitle-alt">Selamat datang, {{ Auth::user()->nama ?? 'Admin' }}. Kelola laporan, pengguna, dan konten dari sini.</p>
         </div>
     </div>
 
     <div class="main-content-alt">
         <div class="container">
+            {{-- Bagian Statistik --}}
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-card-icon blue">📥</div>
@@ -46,26 +46,33 @@
                 </div>
             </div>
 
-            <div class="dashboard-table-container">
-                <h2 class="section-heading-alt">Aksi Cepat Admin</h2>
-                <div class="admin-quick-actions"> {{-- Ini adalah div pembungkus untuk tombol --}}
-                    {{-- Tombol Verifikasi Laporan --}}
+            {{-- Bagian Manajemen --}}
+            <div class="dashboard-management-container">
+                <h2 class="section-heading-alt">Manajemen Utama</h2>
+                <div class="admin-quick-actions">
                     <a href="{{ route('admin.reports.pending_approval') }}" class="admin-action-btn primary-blue">
-                        Verifikasi Laporan Baru ({{ $pendingApprovalReports }})
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verifikasi Laporan ({{ $pendingApprovalReports }})</span>
                     </a>
-                    {{-- Tombol Kelola Edukasi --}}
+                    <a href="{{ route('admin.reports.index') }}" class="admin-action-btn primary-dark">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Kelola Semua Laporan</span>
+                    </a>
                     <a href="{{ route('admin.education.index') }}" class="admin-action-btn primary-green">
-                        Kelola Edukasi
+                        <i class="fas fa-book"></i>
+                        <span>Kelola Edukasi</span>
                     </a>
-                    {{-- Tambahkan tautan lain jika ada manajemen user, setting, dll. --}}
+                     <a href="{{ route('admin.users.index') }}" class="admin-action-btn primary-dark">
+                        <i class="fas fa-users"></i>
+                        <span>Manajemen Pengguna</span>
+                    </a>
+                     <a href="#" class="admin-action-btn primary-dark">
+                        <i class="fas fa-cog"></i>
+                        <span>Pengaturan Sistem</span>
+                    </a>
                 </div>
-
-                <h2 class="section-heading-alt" style="margin-top: 2rem;">Manajemen Lainnya</h2>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 0.5rem;"><a href="#" class="section-link">Manajemen Pengguna</a></li>
-                    <li style="margin-bottom: 0.5rem;"><a href="#" class="section-link">Pengaturan Sistem</a></li>
-                </ul>
             </div>
+
         </div>
     </div>
 </div>

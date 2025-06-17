@@ -1,37 +1,47 @@
 @extends('layouts.app')
 
-@section('title', $article['title'] . ' - Edukasi EcoWatch')
-@section('description', 'Baca artikel lengkap tentang ' . $article['title'] . ' dan tingkatkan pengetahuan lingkungan Anda.')
+@section('title', $article->title . ' - EcoWatch')
+@section('description', Str::limit(strip_tags($article->content), 150))
 
 @section('content')
 <div class="page-container">
     <div class="main-content-alt">
         <div class="container" style="max-width: 800px;">
             <article class="article-detail-content">
-                <header class="article-detail-header">
-                    <span class="article-category-badge">{{ $article['category'] }}</span>
-                    <h1 class="article-detail-title">{{ $article['title'] }}</h1>
-                    <div class="article-detail-meta">
-                        <span>Oleh <strong>{{ $article['author'] }}</strong></span>
-                        <span class="meta-separator">|</span>
-                        <span>Dipublikasikan pada {{ $article['publish_date'] }}</span>
-                        <span class="meta-separator">|</span>
-                        <span>📖 {{ $article['reading_time'] }}</span>
-                    </div>
-                </header>
+                {{-- Kategori & Tanggal --}}
+                <div class="article-detail-meta">
+                    <span class="badge badge-primary p-2">{{ $article->category }}</span>
+                    <span class="mx-2">·</span>
+                    <span>Dipublikasikan pada {{ $article->created_at->format('d F Y') }}</span>
+                </div>
 
-                <figure class="article-detail-figure">
-                    {{-- PERBAIKAN: Memastikan gambar dinamis dari controller --}}
-                    <img src="{{ $article['image_url'] }}" alt="{{ $article['title'] }}" class="article-detail-image">
-                </figure>
+                {{-- Judul Artikel --}}
+                <h1 class="article-detail-title">{{ $article->title }}</h1>
 
-                <section class="article-body">
-                    <p>{{ $article['content'] }}</p>
-                    {{-- Contoh paragraf tambahan --}}
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </section>
+                {{-- Gambar Utama --}}
+                @if($article->image)
+                    <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}" class="article-detail-image">
+                @endif
+
+                {{-- Isi Konten --}}
+                <div class="article-detail-body">
+                    {!! nl2br(e($article->content)) !!}
+                </div>
             </article>
+
+             {{-- Tombol Kembali --}}
+            <div class="text-center mt-5">
+                <a href="{{ route('education.index') }}" class="btn btn-secondary">← Kembali ke Semua Artikel</a>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .article-detail-content { margin-top: 2rem; }
+    .article-detail-meta { margin-bottom: 1rem; color: #6c757d; font-size: 0.9rem; }
+    .article-detail-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .article-detail-image { width: 100%; height: auto; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .article-detail-body { font-size: 1.1rem; line-height: 1.8; color: #333; }
+</style>
 @endsection

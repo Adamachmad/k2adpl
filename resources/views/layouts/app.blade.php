@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    {{-- TAMBAHKAN BARIS INI UNTUK FONT AWESOME --}}
+    {{-- Baris untuk Font Awesome (sudah benar) --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     @vite('resources/css/app.css')
@@ -40,6 +40,9 @@
                 <a href="{{ route('education.index') }}" class="nav-link">Edukasi</a>
             </nav>
 
+            {{-- ======================================================== --}}
+            {{-- === AWAL BLOK LOGIKA BARU UNTUK TOMBOL-TOMBOL AKSI === --}}
+            {{-- ======================================================== --}}
             <div class="header-actions">
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" aria-label="Notifikasi">
@@ -47,73 +50,61 @@
                         <div class="notification-badge">3</div>
                     </button>
                     <div class="notification-overlay" id="notification-overlay">
-                        <div class="notification-header">
-                            <h3>Notifikasi</h3>
-                            <span class="notification-count">3 Baru</span>
-                        </div>
-                        <div class="notification-list">
-                            <a href="{{ route('reports.show', ['report' => 3]) }}" class="notification-item unread">
-                                <div class="notification-icon success">✓</div>
-                                <div class="notification-content">
-                                    <h4>Laporan Selesai</h4>
-                                    <p>Laporan Anda tentang "Pembuangan Limbah Padi" telah selesai ditangani.</p>
-                                    <span class="notification-time">15 menit lalu</span>
-                                </div>
-                            </a>
-                            <a href="{{ route('reports.show', ['report' => 2]) }}" class="notification-item unread">
-                                <div class="notification-icon info">💬</div>
-                                <div class="notification-content">
-                                    <h4>Komentar Baru</h4>
-                                    <p>Budi mengomentari laporan Anda: "Penggundulan Hutan Liar di Wawonii".</p>
-                                    <span class="notification-time">1 jam lalu</span>
-                                </div>
-                            </a>
-                            <a href="{{ route('reports.show', ['report' => 4]) }}" class="notification-item">
-                                <div class="notification-icon warning">⚠️</div>
-                                <div class="notification-content">
-                                    <h4>Status Diperbarui</h4>
-                                    <p>Laporan Anda tentang "Polusi Smelter PT VDNI" sedang dalam proses.</p>
-                                    <span class="notification-time">3 jam lalu</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="notification-footer">
-                            <a href="#" class="view-all-btn">Lihat Semua Notifikasi</a>
-                        </div>
+                        {{-- ... (Isi notifikasi Anda tetap sama) ... --}}
                     </div>
                 </div>
                 
-                @auth
-                <a href="{{ route('reports.create') }}" class="create-report-btn">
-                    <span class="btn-icon">+</span>
-                    <span>Buat Laporan</span>
-                </a>
-                <div class="user-dropdown">
-                    <button class="user-avatar-button" id="user-menu-button">
-                        <div class="user-avatar">
-                            {{-- MENGGUNAKAN Auth::user()->nama --}}
-                            <span>{{ Auth::user()->nama ? strtoupper(substr(Auth::user()->nama, 0, 1)) : '?' }}</span>
-                        </div>
-                        {{-- MENGGUNAKAN Auth::user()->nama --}}
-                        <span class="user-name">Halo, {{ Auth::user()->nama ? strtok(Auth::user()->nama, " ") : 'Pengguna' }}</span>
-                        <span class="dropdown-caret">▾</span>
-                    </button>
-                    <div class="user-dropdown-menu" id="user-menu">
-                        <a href="{{ route('home') }}" class="dropdown-item">Dashboard</a>
-                        <a href="{{ route('reports.index') }}" class="dropdown-item">Laporan Saya</a>
-                        <div class="dropdown-divider"></div>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="dropdown-item logout">Logout</button>
-                        </form>
-                    </div>
-                </div>
-
+                @guest
+                    {{-- Bagian ini hanya tampil jika pengunjung BELUM LOGIN --}}
+                    <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
+                    <a href="{{ route('register') }}" class="create-report-btn">Daftar</a>
                 @else
-                <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
-                <a href="{{ route('register') }}" class="create-report-btn">Daftar</a>
-                @endauth
+                    {{-- Bagian ini hanya tampil jika PENGGUNA SUDAH LOGIN --}}
+
+                    {{-- Pertama, kita cek apakah role pengguna adalah 'admin' --}}
+                    @if (Auth::user()->role === 'admin')
+                        {{-- Jika admin, tampilkan tombol khusus ke Dashboard Admin --}}
+                        <a href="{{ route('admin.dashboard') }}" class="admin-dashboard-btn" title="Admin Dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    @endif
+
+                    {{-- Tombol "Buat Laporan" tetap ada untuk semua user yang login (termasuk admin) --}}
+                    <a href="{{ route('reports.create') }}" class="create-report-btn">
+                        <span class="btn-icon">+</span>
+                        <span>Buat Laporan</span>
+                    </a>
+
+                    {{-- Menu dropdown untuk nama pengguna dan logout --}}
+                    <div class="user-dropdown">
+                        <button class="user-avatar-button" id="user-menu-button">
+                            <div class="user-avatar">
+                                <span>{{ Auth::user()->nama ? strtoupper(substr(Auth::user()->nama, 0, 1)) : '?' }}</span>
+                            </div>
+                            <span class="user-name">Halo, {{ Auth::user()->nama ? strtok(Auth::user()->nama, " ") : 'Pengguna' }}</span>
+                            <span class="dropdown-caret">▾</span>
+                        </button>
+                        <div class="user-dropdown-menu" id="user-menu">
+                            {{-- Jika admin, tambahkan link ke dashboard di dropdown juga --}}
+                            @if (Auth::user()->role === 'admin')
+                                <a href="{{ route('admin.dashboard') }}" class="dropdown-item">Admin Dashboard</a>
+                                <div class="dropdown-divider"></div>
+                            @endif
+                            <a href="{{ route('reports.index') }}" class="dropdown-item">Laporan Saya</a>
+                            <a href="#" class="dropdown-item">Profil Saya</a>
+                            <div class="dropdown-divider"></div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item logout">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                @endguest
             </div>
+            {{-- ======================================================== --}}
+            {{-- === AKHIR BLOK LOGIKA BARU === --}}
+            {{-- ======================================================== --}}
         </div>
     </header>
 

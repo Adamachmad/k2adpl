@@ -4078,5 +4078,182 @@ body {
         width: 100%; /* Ensure full width when stacked */
     }
 }
+.form-delete {
+  display: inline-block;
+  margin-left: 10px;
+}
 
-/* ... (Sisa gaya admin dashboard di bawah) ... */
+.btn-delete {
+  background-color: #e53e3e; /* Merah */
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+.btn-delete:hover {
+  background-color: #c53030; /* Merah lebih gelap */
+}
+/* === Gaya untuk Tombol Aksi di Dashboard Admin === */
+
+.admin-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* Memberi jarak antar tombol */
+}
+
+.admin-action-btn {
+    display: inline-flex; /* Membuat ikon dan teks sejajar */
+    align-items: center;
+    gap: 0.75rem; /* Jarak antara ikon dan teks */
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    color: white;
+    text-decoration: none;
+}
+
+/* Variasi Warna Tombol */
+.primary-blue { background-color: #3490dc; }
+.primary-green { background-color: #38c172; }
+.primary-dark { background-color: #34495e; }
+
+/* Sedikit penyesuaian untuk ukuran ikon */
+.admin-action-btn .fas {
+    font-size: 1.1em;
+    width: 20px; /* Memberi lebar tetap agar teks sejajar */
+    text-align: center;
+}
+
+.dashboard-management-container {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e3e3e3;
+}
+/* === Gaya untuk Form Admin yang Lebih Baik === */
+
+.form-group .form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control,
+.form-control-file {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: #dc3545;
+}
+
+.is-invalid ~ .invalid-feedback,
+.is-invalid ~ .custom-file-upload .invalid-feedback {
+    display: block;
+}
+
+
+/* === Gaya Khusus untuk Input File (UI Diperbarui) === */
+.custom-file-upload .form-control-file {
+    display: none; /* Sembunyikan input file asli */
+}
+
+.custom-file-upload .custom-file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    width: 100%;
+    color: #6c757d;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.custom-file-upload .custom-file-label:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.custom-file-upload .custom-file-label i {
+    color: #6c757d;
+}
+
+
+/* === Gaya untuk Tombol Aksi (UI Diperbarui) === */
+.form-actions {
+    display: flex;
+    justify-content: flex-end; /* Memindahkan tombol ke kanan */
+    gap: 0.75rem; /* Memberi jarak antar tombol */
+    margin-top: 2rem;
+}
+
+.form-actions .btn {
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 20px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.form-actions .btn-secondary {
+    background-color: #e9ecef;
+    color: #343a40;
+}
+.form-actions .btn-secondary:hover {
+    background-color: #d3d9df;
+}
+
+.form-actions .btn-success {
+    background-color: #28a745; /* Warna hijau yang konsisten */
+    color: white;
+}
+.form-actions .btn-success:hover {
+    background-color: #218838;
+}

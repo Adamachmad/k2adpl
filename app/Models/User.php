@@ -46,7 +46,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         // 'password' => 'hashed', // <<< KOMENTARI/HAPUS BARIS INI
     ];
-
+    
     /**
      * Mendefinisikan relasi: Setiap User bisa memiliki banyak Laporan (Report).
      */
@@ -60,4 +60,5 @@ class User extends Authenticatable
     {
         return $this->attributes['nama'] ?? '';
     }
+    
 }

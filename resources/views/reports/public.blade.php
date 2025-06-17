@@ -21,41 +21,48 @@
             </div>
 
             <div class="report-list">
-                <div class="report-list-item">
-                    <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/8ec9bb7dfb0b27b3c9bc530655a4e010361d6844?placeholderIfAbsent=true&format=webp&width=300" alt="Polusi Smelter" class="report-item-img">
-                    <div class="report-item-content">
-                        <div class="report-item-header">
-                            <span class="report-item-category">Pencemaran Udara</span>
-                            <span class="status-badge active">Aktif</span>
+                {{-- Gunakan @forelse untuk loop data dari controller --}}
+                @forelse($reports as $report)
+                    <div class="report-list-item">
+                        @php
+                            // Logika untuk mendapatkan URL gambar pertama atau placeholder
+                            // Memastikan $report->fotoBukti ada, merupakan array, dan tidak kosong
+                            $photos = $report->fotoBukti;
+                            $firstPhotoUrl = ($photos && is_array($photos) && !empty($photos))
+                                ? asset('storage/' . $photos[0])
+                                : asset('img/placeholder.jpg');
+                        @endphp
+                        {{-- Tampilkan gambar secara dinamis --}}
+                        <img src="{{ $firstPhotoUrl }}" alt="{{ $report->judul }}" class="report-item-img">
+                        
+                        <div class="report-item-content">
+                            <div class="report-item-header">
+                                {{-- Tampilkan data dinamis dari database --}}
+                                <span class="report-item-category">{{ $report->category ?? 'Umum' }}</span>
+                                <span class="status-badge {{ strtolower($report->status) }}">{{ $report->status }}</span>
+                            </div>
+                            <h3 class="report-item-title">{{ $report->judul }}</h3>
+                            <p class="report-item-location">{{ $report->lokasi }}</p>
+                            <p class="report-item-date">Dilaporkan oleh: {{ $report->user->name ?? 'Anonim' }} - {{ $report->created_at->format('d F Y') }}</p>
                         </div>
-                        <h3 class="report-item-title">Polusi Smelter PT VDNI di Morosi</h3>
-                        <p class="report-item-location">Konawe, Sulawesi Tenggara</p>
-                        <p class="report-item-date">Dilaporkan oleh: Budi S. - 12 Juni 2025</p>
+                        {{-- Buat link ke detail laporan secara dinamis --}}
+                        <a href="{{ route('reports.show', $report->id) }}" class="btn-detail">Lihat Detail</a>
+                        
                     </div>
-                    <a href="{{ route('reports.show', ['report' => 4]) }}" class="btn-detail">Lihat Detail</a>
-                </div>
-                 <div class="report-list-item">
-                    <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/624e7fcaf2f3148b658fbab940f49a9390432f27?placeholderIfAbsent=true&format=webp&width=300" alt="Penggundulan Hutan" class="report-item-img">
-                    <div class="report-item-content">
-                        <div class="report-item-header">
-                            <span class="report-item-category">Deforestasi</span>
-                            <span class="status-badge processing">Diproses</span>
-                        </div>
-                        <h3 class="report-item-title">Penggundulan Hutan Liar di Wawonii</h3>
-                        <p class="report-item-location">Konawe Kepulauan, Sulawesi Tenggara</p>
-                        <p class="report-item-date">Dilaporkan oleh: Ani P. - 10 Juni 2025</p>
+                @empty
+                    {{-- Bagian ini akan tampil jika tidak ada laporan sama sekali di database --}}
+                    <div class="empty-state" style="width: 100%; text-align: center; padding: 4rem 0;">
+                        <h2 class="empty-state-title">Belum Ada Laporan Publik</h2>
+                        <p class="empty-state-text">Jadilah yang pertama melaporkan masalah lingkungan di sekitar Anda!</p>
+                        <a href="{{ route('reports.create') }}" class="btn-primary" style="background: var(--primary-green); color: white; margin-top: 1rem;">Buat Laporan Baru</a>
                     </div>
-                    <a href="{{ route('reports.show', ['report' => 1]) }}" class="btn-detail">Lihat Detail</a>
-                </div>
+                @endforelse
             </div>
             
-            <nav class="pagination">
-                <a href="#" class="page-link disabled">Sebelumnya</a>
-                <a href="#" class="page-link active">1</a>
-                <a href="#" class="page-link">2</a>
-                <a href="#" class="page-link">3</a>
-                <a href="#" class="page-link">Selanjutnya</a>
-            </nav>
+            {{-- Tampilkan navigasi halaman (pagination) secara dinamis --}}
+            <div class="pagination-container" style="margin-top: 2rem;">
+                {{ $reports->links() }}
+            </div>
         </div>
     </div>
 </div>

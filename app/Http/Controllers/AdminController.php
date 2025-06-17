@@ -3,19 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
-use App\Models\Education; // Tambahkan model Education
-use App\Models\User;      // Tambahkan model User
+use App\Models\Education;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage; // Untuk menghapus file
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
     /**
      * Menampilkan dashboard admin.
-     * @return \Illuminate\View\View
      */
     public function dashboard(): View
     {
@@ -28,26 +27,34 @@ class AdminController extends Controller
     }
 
     /**
+     * Menampilkan semua laporan untuk dikelola oleh Admin.
+     */
+    public function allReports(): View
+    {
+        // 'with('user')' adalah optimasi agar query lebih efisien (menghindari N+1 problem)
+        $reports = Report::with('user')->latest()->paginate(15); 
+        return view('admin.reports.index', compact('reports'));
+    }
+
+    /**
      * Menampilkan daftar laporan yang menunggu persetujuan admin.
-     * @return \Illuminate\View\View
      */
     public function pendingApprovalReports(): View
     {
         $reports = Report::where('is_approved_by_admin', false)
-                         ->latest()
-                         ->paginate(10);
+                            ->latest()
+                            ->paginate(10);
         return view('admin.reports.pending_approval', compact('reports'));
     }
 
     /**
      * Menyetujui laporan oleh admin.
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function approveReport($id): RedirectResponse
     {
         $report = Report::findOrFail($id);
         $report->is_approved_by_admin = true;
+        $report->status = 'DIPROSES'; // Mengubah status saat disetujui
         $report->save();
 
         return redirect()->route('admin.reports.pending_approval')->with('status', 'Laporan berhasil disetujui dan diteruskan ke Dinas!');
@@ -55,23 +62,40 @@ class AdminController extends Controller
 
     /**
      * Menolak laporan oleh admin.
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function rejectReportByAdmin($id): RedirectResponse
     {
         $report = Report::findOrFail($id);
-        // Tambahkan logika penolakan jika diperlukan (misalnya, menambahkan catatan penolakan)
-        $report->delete(); // Atau set status ke "DITOLAK" jika Anda tidak ingin menghapus permanen
+        // PERBAIKAN: Kode asli Anda menghapus laporan, yang lebih cocok untuk fungsi 'destroy'.
+        // Di sini kita ubah statusnya saja agar lebih sesuai dengan aksi "Tolak".
+        $report->status = 'DITOLAK';
+        $report->save();
 
         return redirect()->route('admin.reports.pending_approval')->with('status', 'Laporan berhasil ditolak.');
     }
 
-    // ====================== EDUKASI =========================
+    /**
+     * Menghapus laporan beserta file-fotonya secara permanen.
+     */
+    public function destroyReport(Report $report): RedirectResponse
+    {
+        // Langkah 1: Hapus file-foto dari storage jika ada
+        if ($report->fotoBukti && is_array($report->fotoBukti)) {
+            foreach ($report->fotoBukti as $photoPath) {
+                Storage::disk('public')->delete($photoPath);
+            }
+        }
+        // Langkah 2: Hapus data laporan dari database
+        $report->delete();
+
+        // Langkah 3: Kembalikan admin ke halaman sebelumnya dengan pesan sukses
+        return redirect()->back()->with('status', 'Laporan berhasil dihapus secara permanen.');
+    }
+
+    // ====================== EDUKASI (BAGIAN YANG DIPERBARUI) =========================
 
     /**
      * Menampilkan daftar artikel edukasi.
-     * @return \Illuminate\View\View
      */
     public function educationIndex(): View
     {
@@ -81,7 +105,6 @@ class AdminController extends Controller
 
     /**
      * Menampilkan form untuk membuat artikel edukasi baru.
-     * @return \Illuminate\View\View
      */
     public function createEducation(): View
     {
@@ -90,96 +113,80 @@ class AdminController extends Controller
 
     /**
      * Menyimpan artikel edukasi baru ke database.
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function storeEducation(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'title' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $imagePath = $request->file('image')->store('education', 'public');
+        if ($request->hasFile('image')) {
+            // Simpan gambar dan dapatkan path-nya untuk disimpan ke database
+            $validatedData['image'] = $request->file('image')->store('education-images', 'public');
+        }
 
-        Education::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'image' => $imagePath,
-        ]);
+        Education::create($validatedData);
 
         return redirect()->route('admin.education.index')->with('status', 'Artikel edukasi berhasil dibuat!');
     }
 
     /**
      * Menampilkan form untuk mengedit artikel edukasi.
-     * @param int $id
-     * @return \Illuminate\View\View
      */
-    public function editEducation($id): View
+    public function editEducation(Education $education): View
     {
-        $article = Education::findOrFail($id);
-        return view('admin.education.edit', compact('article'));
+        // Menggunakan Route Model Binding untuk mengambil data artikel secara otomatis
+        return view('admin.education.edit', ['article' => $education]);
     }
 
     /**
      * Mengupdate artikel edukasi di database.
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function updateEducation(Request $request, $id): RedirectResponse
+    public function updateEducation(Request $request, Education $education): RedirectResponse
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'title' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'content' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $article = Education::findOrFail($id);
-
-        $article->title = $request->title;
-        $article->content = $request->content;
-
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($article->image) {
-                Storage::delete('public/' . $article->image);
+            // Hapus gambar lama jika ada sebelum mengupload yang baru
+            if ($education->image) {
+                Storage::disk('public')->delete($education->image);
             }
-            $imagePath = $request->file('image')->store('education', 'public');
-            $article->image = $imagePath;
+            // Simpan gambar baru dan tambahkan path ke data yang akan diupdate
+            $validatedData['image'] = $request->file('image')->store('education-images', 'public');
         }
-
-        $article->save();
+        
+        $education->update($validatedData);
 
         return redirect()->route('admin.education.index')->with('status', 'Artikel edukasi berhasil diperbarui!');
     }
 
     /**
      * Menghapus artikel edukasi dari database.
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroyEducation($id): RedirectResponse
+    public function destroyEducation(Education $education): RedirectResponse
     {
-         $article = Education::findOrFail($id);
-
         // Hapus gambar terkait jika ada
-        if ($article->image) {
-            Storage::delete('public/' . $article->image);
+        if ($education->image) {
+            Storage::disk('public')->delete($education->image);
         }
 
-        $article->delete();
+        $education->delete();
 
         return redirect()->route('admin.education.index')->with('status', 'Artikel edukasi berhasil dihapus!');
     }
 
-    // ====================== PENGGUNA =========================
+    // ====================== PENGGUNA (KODE ASLI ANDA) =========================
 
     /**
      * Menampilkan daftar pengguna.
-     * @return \Illuminate\View\View
      */
     public function userIndex(): View
     {
@@ -189,19 +196,18 @@ class AdminController extends Controller
 
     /**
      * Menampilkan detail pengguna.
-     * @param int $id
-     * @return \Illuminate\View\View
      */
-     public function showUser($id): View
-     {
-         $user = User::findOrFail($id);
-         return view('admin.users.show', compact('user'));
-     }
+    public function showUser($id): View
+{
+    // Menggunakan with('reports') untuk mengambil data user dan semua laporannya
+    // sekaligus dalam satu query yang efisien.
+    $user = User::with('reports')->findOrFail($id);
+
+    return view('admin.users.show', compact('user'));
+}
 
     /**
      * Menghapus pengguna.
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroyUser($id): RedirectResponse
     {

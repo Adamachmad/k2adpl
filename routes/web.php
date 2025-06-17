@@ -5,7 +5,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\RegisterController as CustomRegisterController;
-use App\Http\Controllers\DinasController; // <<< TAMBAHKAN INI
+use App\Http\Controllers\DinasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,8 +24,12 @@ use App\Http\Controllers\DinasController; // <<< TAMBAHKAN INI
 
 // Route Halaman Utama (Homepage)
 Route::get('/', function () {
-    $recentReports = App\Models\Report::latest()->take(4)->get();
-    return view('welcome', compact('recentReports'));
+    $recentReports = App\Models\Report::where('status', '!=', 'DRAFT')->latest()->take(4)->get();
+    // Menambahkan pengambilan data untuk artikel edukasi
+    $recentArticles = App\Models\Education::latest()->take(3)->get(); 
+    
+    // Mengirim kedua variabel ke view
+    return view('welcome', compact('recentReports', 'recentArticles'));
 })->name('home');
 
 // Route untuk Login (menampilkan form)
@@ -45,7 +49,6 @@ Route::post('/register', [CustomRegisterController::class, 'registerUser'])->nam
 
 // =======================================================
 // === ALUR PEMBUATAN LAPORAN (MULTI-STEP) ===
-// Menggunakan middleware 'auth' untuk melindungi rute ini agar hanya bisa diakses user terautentikasi
 // =======================================================
 Route::middleware(['auth'])->group(function () {
     // Langkah 1: Halaman memilih Jenis Laporan
@@ -58,7 +61,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Langkah 3: Halaman mengisi Deskripsi & Foto
     Route::get('/laporan/buat/deskripsi', [ReportController::class, 'createStep3'])->name('reports.create.step3');
-    Route::post('/laporan/buat/deskripsi', [ReportController::class, 'postStep3'])->name('reports.create.step3.post'); // Aksi POST untuk step 3
+    Route::post('/laporan/buat/deskripsi', [ReportController::class, 'postStep3'])->name('reports.create.step3.post');
 
     // Langkah 4: Halaman Konfirmasi Laporan
     Route::get('/laporan/buat/konfirmasi', [ReportController::class, 'createStep4'])->name('reports.create.step4');
@@ -78,11 +81,10 @@ Route::middleware(['auth'])->group(function () {
 // Halaman untuk melihat semua laporan publik
 Route::get('/laporan/publik', [ReportController::class, 'publicIndex'])->name('reports.public');
 
-// Halaman untuk melihat laporan milik pengguna yang sedang login (dilindungi Auth)
+// Halaman untuk melihat laporan milik pengguna yang sedang login
 Route::get('/laporan-saya', [ReportController::class, 'index'])->name('reports.index')->middleware('auth');
 
 // Halaman untuk menampilkan detail dari satu laporan
-// {report} adalah parameter dinamis, misal /laporan/1 atau /laporan/2
 Route::get('/laporan/{report}', [ReportController::class, 'show'])->name('reports.show');
 
 
@@ -91,51 +93,49 @@ Route::get('/laporan/{report}', [ReportController::class, 'show'])->name('report
 // =======================================================
 
 // Halaman utama Edukasi
-Route::get('/edukasi', function () {
-    return view('education.index'); // Atau [EducationController::class, 'index'] jika ada
-})->name('education.index');
+Route::get('/edukasi', [EducationController::class, 'index'])->name('education.index');
 
 // Halaman untuk menampilkan detail artikel edukasi
-Route::get('/edukasi/{article}', function ($articleId) {
-    // Ini hanyalah contoh data statis. Nanti Anda akan mengambil dari database.
-    $articles = [
-        1 => ['title' => 'Cara Mengurangi Jejak Karbon di Rumah', 'content' => 'Isi lengkap artikel tentang jejak karbon...', 'image' => 'https://images.unsplash.com/photo-1542601904-45B6A6358354?q=80&w=1470&auto=format&fit=crop'],
-        2 => ['title' => 'Pentingnya Daur Ulang untuk Masa Depan', 'content' => 'Isi lengkap artikel tentang daur ulang...', 'image' => 'https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?q=80&w=1470&auto=format&fit=crop'],
-        3 => ['title' => 'Dampak Perubahan Iklim Global', 'content' => 'Isi lengkap artikel tentang perubahan iklim...', 'image' => 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?q=80&w=1441&auto=format&fit=crop'],
-    ];
-
-    $article = $articles[$articleId] ?? null;
-
-    if (!$article) {
-        abort(404, 'Artikel tidak ditemukan.');
-    }
-    return view('education.show', compact('article'));
-})->name('education.show');
+Route::get('/edukasi/{article}', [EducationController::class, 'show'])->name('education.show');
 
 // =======================================================
-// === HALAMAN ADMINISTRATOR (Dilindungi Middleware 'auth' dan 'admin') ===
+// === HALAMAN ADMINISTRATOR ===
 // =======================================================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard Admin
+    
+    // Dashboard Utama Admin
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Pengelolaan Laporan (Admin menyetujui laporan untuk dinas)
+    // --- Manajemen Laporan ---
+    Route::get('/reports', [AdminController::class, 'allReports'])->name('reports.index');
     Route::get('/reports/pending-approval', [AdminController::class, 'pendingApprovalReports'])->name('reports.pending_approval');
     Route::post('/reports/{id}/approve', [AdminController::class, 'approveReport'])->name('reports.approve');
-    Route::post('/reports/{id}/reject-admin', [AdminController::class, 'rejectReportByAdmin'])->name('reports.reject_admin'); // Jika ada penolakan oleh admin
+    Route::post('/reports/{id}/reject-admin', [AdminController::class, 'rejectReportByAdmin'])->name('reports.reject_admin');
+    Route::delete('/reports/{report}', [AdminController::class, 'destroyReport'])->name('reports.destroy');
 
-    // Pengelolaan Edukasi (Admin saja yang bisa)
+    // --- Manajemen Edukasi ---
     Route::get('/education', [AdminController::class, 'educationIndex'])->name('education.index');
     Route::get('/education/create', [AdminController::class, 'createEducation'])->name('education.create');
     Route::post('/education', [AdminController::class, 'storeEducation'])->name('education.store');
-    Route::get('/education/{id}/edit', [AdminController::class, 'editEducation'])->name('education.edit');
-    Route::put('/education/{id}', [AdminController::class, 'updateEducation'])->name('education.update');
-    Route::delete('/education/{id}', [AdminController::class, 'destroyEducation'])->name('education.destroy');
+    Route::get('/education/{education}/edit', [AdminController::class, 'editEducation'])->name('education.edit');
+    Route::put('/education/{education}', [AdminController::class, 'updateEducation'])->name('education.update');
+    Route::delete('/education/{education}', [AdminController::class, 'destroyEducation'])->name('education.destroy');
+    
+    // --- Manajemen Pengguna ---
+    Route::get('/users', [AdminController::class, 'userIndex'])->name('users.index');
+    Route::get('/users/{id}', [AdminController::class, 'showUser'])->name('users.show');
+    Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+
+    // --- Pengaturan Sistem (Contoh) ---
+    Route::get('/settings', function() { 
+        return "Halaman Pengaturan Sistem Segera Hadir"; 
+    })->name('settings.index');
+
 });
 
 
 // =======================================================
-// === HALAMAN DINAS (Dilindungi Middleware 'auth' dan 'dinas') ===
+// === HALAMAN DINAS ===
 // =======================================================
 Route::middleware(['auth', 'dinas'])->prefix('dinas')->name('dinas.')->group(function () {
     Route::get('/dashboard', [DinasController::class, 'dashboard'])->name('dashboard');
