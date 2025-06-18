@@ -4257,3 +4257,10 @@ body {
 .form-actions .btn-success:hover {
     background-color: #218838;
 }
+
+.category-icon-small.blue { background-color: #007BFF; color: white; }
+.category-icon-small.orange { background-color: #fd7e14; color: white; }
+.category-icon-small.brown { background-color: #8B4513; color: white; }
+.category-icon-small.green { background-color: #28a745; color: white; }
+.category-icon-small.red { background-color: #dc3545; color: white; }
+.category-icon-small.gray { background-color: #6c757d; color: white; }

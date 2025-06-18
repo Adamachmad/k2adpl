@@ -47,14 +47,29 @@
                     </ul>
                 </div>
             @endif
-            <div class="selected-category-card">
-                <div class="category-icon-small blue">💧</div>
-                <div class="category-info">
-                    <span>Jenis Laporan Terpilih</span>
-                    {{-- Menampilkan kategori dari data session --}}
-                    <strong>{{ $data['category'] ?? 'Tidak Diketahui' }}</strong>
-                </div>
+            @php
+            $category = $data['category'] ?? '';
+            $icons = [
+                'Pencemaran Air' => ['icon' => '💧', 'color' => 'blue'],
+                'Pencemaran Udara' => ['icon' => '🏭', 'color' => 'orange'],
+                'Pencemaran Tanah' => ['icon' => '🌱', 'color' => 'brown'],
+                'Deforestasi' => ['icon' => '🌳', 'color' => 'green'],
+                'Kerusakan Ekosistem' => ['icon' => '🗑️', 'color' => 'red'],
+                'Lainnya' => ['icon' => '⚠️', 'color' => 'gray'],
+            ];
+            $selectedIcon = $icons[$category] ?? ['icon' => '❓', 'color' => 'gray'];
+        @endphp
+
+        <div class="selected-category-card">
+            <div class="category-icon-small {{ $selectedIcon['color'] }}">
+                {{ $selectedIcon['icon'] }}
             </div>
+            <div class="category-info">
+                <span>Jenis Laporan Terpilih</span>
+                <strong>{{ $category ?: 'Tidak Diketahui' }}</strong>
+            </div>
+        </div>
+
 
             <form class="report-form" action="{{ route('reports.create.step2.post') }}" method="POST">
                 @csrf
