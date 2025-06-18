@@ -14,37 +14,30 @@ use Illuminate\Support\Facades\Hash;
 
 class ReportController extends Controller
 {
-    // =======================================================
-    // === METHOD YANG TIDAK DIUBAH (KODE ASLI ANDA) ===
-    // =======================================================
+    // ... SEMUA FUNGSI LAIN DARI KODE ASLI ANDA TETAP SAMA ...
     public function index(): View
     {
         $reports = Report::where('user_id', Auth::id())->latest()->paginate(10);
         return view('reports.index', compact('reports'));
     }
-
     public function publicIndex(): View
     {
-        $reports = Report::latest()->paginate(10);
+        $reports = Report::latest()->where('status', '!=', 'DRAFT')->paginate(10);
         return view('reports.public', compact('reports'));
     }
-
     public function show($id): View
     {
         $report = Report::findOrFail($id);
         return view('reports.show', compact('report'));
     }
-    
     public function success(): View
     {
         return view('reports.success');
     }
-
     public function showLoginForm(): View
     {
         return view('auth.login');
     }
-
     public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
@@ -67,7 +60,6 @@ class ReportController extends Controller
             'email' => 'Email atau password yang Anda masukkan tidak sesuai.',
         ]);
     }
-
     public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
@@ -77,7 +69,7 @@ class ReportController extends Controller
     }
 
     // =======================================================
-    // === METHOD ALUR LAPORAN (LOGIKA BARU & STABIL) ===
+    // === ALUR PEMBUATAN LAPORAN (LOGIKA DRAFT & PERBAIKAN) ===
     // =======================================================
 
     public function createStep1(): View
@@ -100,7 +92,7 @@ class ReportController extends Controller
     public function createStep2(Request $request): View
     {
         if (!session()->has('draft_report_id')) {
-            return redirect()->route('reports.create')->withErrors('Silakan mulai dari langkah 1.');
+            return redirect()->route('reports.create');
         }
         $report = Report::findOrFail(session('draft_report_id'));
         return view('reports.create-step-2', ['data' => $report->toArray()]);
@@ -115,6 +107,8 @@ class ReportController extends Controller
             'alamat' => 'required|string',
         ]);
         $report = Report::findOrFail(session('draft_report_id'));
+        
+        // Cukup simpan string lokasi yang sudah digabung
         $report->update([
             'lokasi' => "{$validatedData['alamat']}, {$validatedData['desa']}, {$validatedData['kecamatan']}, {$validatedData['kabupaten']}, {$validatedData['provinsi']}",
         ]);
@@ -132,7 +126,8 @@ class ReportController extends Controller
     {
         if (!session()->has('draft_report_id')) { return redirect()->route('reports.create'); }
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255', 'description' => 'required|string',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'photos' => 'nullable|array|max:5', 'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
         $report = Report::findOrFail(session('draft_report_id'));
@@ -154,26 +149,40 @@ class ReportController extends Controller
         return redirect()->route('reports.create.step4');
     }
     
+    /**
+     * LANGKAH 4: Menampilkan halaman konfirmasi dari data final di database.
+     */
     public function createStep4(Request $request): View
     {
-        if (!session()->has('draft_report_id')) { return redirect()->route('reports.create'); }
+        if (!session()->has('draft_report_id')) {
+            return redirect()->route('reports.create')->withErrors('Sesi laporan tidak ditemukan.');
+        }
         $report = Report::findOrFail(session('draft_report_id'));
         
-        $data = json_decode($report->toJson(), true);
-        // Menyesuaikan nama variabel agar view Anda tidak perlu diubah sama sekali
-        $data['photo_paths'] = $report->fotoBukti; 
+        // Mengubah model menjadi array
+        $data = $report->toArray();
+
+        // "Menerjemahkan" nama kolom database ke nama yang diharapkan oleh view
+        $data['title'] = $report->judul;
+        $data['description'] = $report->deskripsi;
+        $data['photo_paths'] = $report->fotoBukti;
         
-        // Memecah kembali 'lokasi' untuk preview, jika diperlukan oleh view Anda
-        $lokasiParts = explode(', ', $report->lokasi);
-        $data['alamat'] = $lokasiParts[0] ?? '';
-        $data['desa'] = $lokasiParts[1] ?? '';
+        // --- INI PERBAIKAN UTAMA UNTUK LOKASI ---
+        // Memecah kembali string 'lokasi' menjadi komponen-komponennya
+        $lokasiParts = explode(', ', $report->lokasi ?? '');
+        $data['alamat']    = $lokasiParts[0] ?? '';
+        $data['desa']      = $lokasiParts[1] ?? '';
         $data['kecamatan'] = $lokasiParts[2] ?? '';
         $data['kabupaten'] = $lokasiParts[3] ?? '';
-        $data['provinsi'] = $lokasiParts[4] ?? '';
+        $data['provinsi']  = $lokasiParts[4] ?? '';
+        // --- AKHIR PERBAIKAN ---
 
         return view('reports.create-step-4', compact('data'));
     }
 
+    /**
+     * PROSES FINAL: Mengubah status laporan dari DRAFT menjadi DITUNDA.
+     */
     public function store(Request $request): RedirectResponse
     {
         if (!session()->has('draft_report_id')) {
@@ -182,7 +191,6 @@ class ReportController extends Controller
         $request->validate(['terms' => 'required|accepted']);
         $report = Report::findOrFail(session('draft_report_id'));
         $report->status = 'DITUNDA';
-        $report->created_at = now();
         $report->save();
         session()->forget('draft_report_id');
         return redirect()->route('reports.success')->with('status', 'Laporan berhasil dikirim!');
