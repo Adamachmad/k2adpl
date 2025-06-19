@@ -4264,3 +4264,30 @@ body {
 .category-icon-small.green { background-color: #28a745; color: white; }
 .category-icon-small.red { background-color: #dc3545; color: white; }
 .category-icon-small.gray { background-color: #6c757d; color: white; }
+
+.report-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.report-category {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3490dc; /* Biru */
+}
+
+.status-badge {
+    padding: 0.25em 0.6em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 20px;
+    color: white;
+}
+
+/* Warna-warna status badge */
+.status-badge.ditunda { background-color: #ffc107; color: #212529; }
+.status-badge.diproses { background-color: #17a2b8; }
+.status-badge.selesai { background-color: #28a745; }
+.status-badge.ditolak { background-color: #dc3545; }

@@ -12,10 +12,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    {{-- Baris untuk Font Awesome (sudah benar) --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     @vite('resources/css/app.css')
+    @stack('styles')
 
 </head>
 <body>
@@ -40,9 +40,6 @@
                 <a href="{{ route('education.index') }}" class="nav-link">Edukasi</a>
             </nav>
 
-            {{-- ======================================================== --}}
-            {{-- === AWAL BLOK LOGIKA BARU UNTUK TOMBOL-TOMBOL AKSI === --}}
-            {{-- ======================================================== --}}
             <div class="header-actions">
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" aria-label="Notifikasi">
@@ -50,33 +47,39 @@
                         <div class="notification-badge">3</div>
                     </button>
                     <div class="notification-overlay" id="notification-overlay">
-                        {{-- ... (Isi notifikasi Anda tetap sama) ... --}}
+                        <div class="notification-header">
+                            <h3>Notifikasi</h3>
+                            <span class="notification-count">3 Baru</span>
+                        </div>
+                        <div class="notification-list">
+                            {{-- ... (Isi notifikasi Anda) ... --}}
+                        </div>
+                        <div class="notification-footer">
+                            <a href="#" class="view-all-btn">Lihat Semua Notifikasi</a>
+                        </div>
                     </div>
                 </div>
                 
-                @guest
-                    {{-- Bagian ini hanya tampil jika pengunjung BELUM LOGIN --}}
-                    <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
-                    <a href="{{ route('register') }}" class="create-report-btn">Daftar</a>
-                @else
-                    {{-- Bagian ini hanya tampil jika PENGGUNA SUDAH LOGIN --}}
+                @auth
+                    {{-- Bagian ini hanya muncul untuk pengguna yang sudah login --}}
 
-                    {{-- Pertama, kita cek apakah role pengguna adalah 'admin' --}}
+                    {{-- PERBAIKAN: Menambahkan tombol dashboard untuk Admin dan Dinas --}}
                     @if (Auth::user()->role === 'admin')
-                        {{-- Jika admin, tampilkan tombol khusus ke Dashboard Admin --}}
                         <a href="{{ route('admin.dashboard') }}" class="admin-dashboard-btn" title="Admin Dashboard">
-                            <i class="fas fa-tachometer-alt"></i>
+                            <i class="fas fa-tachometer-alt"></i> 
+                            <span>Dashboard</span>
+                        </a>
+                    @elseif (Auth::user()->role === 'dinas')
+                        <a href="{{ route('dinas.dashboard') }}" class="dinas-dashboard-btn" title="Dinas Dashboard">
+                            <i class="fas fa-building"></i>
                             <span>Dashboard</span>
                         </a>
                     @endif
-
-                    {{-- Tombol "Buat Laporan" tetap ada untuk semua user yang login (termasuk admin) --}}
+                    
                     <a href="{{ route('reports.create') }}" class="create-report-btn">
                         <span class="btn-icon">+</span>
                         <span>Buat Laporan</span>
                     </a>
-
-                    {{-- Menu dropdown untuk nama pengguna dan logout --}}
                     <div class="user-dropdown">
                         <button class="user-avatar-button" id="user-menu-button">
                             <div class="user-avatar">
@@ -86,13 +89,8 @@
                             <span class="dropdown-caret">▾</span>
                         </button>
                         <div class="user-dropdown-menu" id="user-menu">
-                            {{-- Jika admin, tambahkan link ke dashboard di dropdown juga --}}
-                            @if (Auth::user()->role === 'admin')
-                                <a href="{{ route('admin.dashboard') }}" class="dropdown-item">Admin Dashboard</a>
-                                <div class="dropdown-divider"></div>
-                            @endif
+                            <a href="{{ route('home') }}" class="dropdown-item">Dashboard</a>
                             <a href="{{ route('reports.index') }}" class="dropdown-item">Laporan Saya</a>
-                            <a href="#" class="dropdown-item">Profil Saya</a>
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -100,11 +98,13 @@
                             </form>
                         </div>
                     </div>
-                @endguest
+
+                @else
+                    {{-- Bagian ini untuk pengunjung --}}
+                    <a href="{{ route('login') }}" class="btn-secondary">Masuk</a>
+                    <a href="{{ route('register') }}" class="create-report-btn">Daftar</a>
+                @endauth
             </div>
-            {{-- ======================================================== --}}
-            {{-- === AKHIR BLOK LOGIKA BARU === --}}
-            {{-- ======================================================== --}}
         </div>
     </header>
 
@@ -151,7 +151,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="copyright">&copy; {{ date('Y') }} EcoWatch. Semua Hak Cipta Dilindungi.</p>
+                <p class="copyright">&copy; {{ date('Y') }} EcoWatch by Kelompok 2. Semua Hak Cipta Dilindungi.</p>
                 <div class="footer-bottom-links">
                     <a href="#" class="footer-bottom-link">Terms</a>
                     <a href="#" class="footer-bottom-link">Privacy</a>

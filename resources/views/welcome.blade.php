@@ -44,7 +44,6 @@
     <div class="partners-container">
         <h2 class="partners-title">Aplikasi Yang Bermitra Dengan Kedinasan:</h2>
         <div class="partner-logos">
-            
             <a href="https://menlhk.go.id/" target="_blank" rel="noopener noreferrer" class="partner-link">
                 <div class="partner-logo">
                     <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/ada15015f30b3cef19222cde70a267df20f45d12?placeholderIfAbsent=true&format=webp&width=400"
@@ -52,7 +51,6 @@
                          loading="lazy">
                 </div>
             </a>
-            
             <a href="https://brgm.go.id/" target="_blank" rel="noopener noreferrer" class="partner-link">
                 <div class="partner-logo">
                     <img src="https://cdn.builder.io/api/v1/image/assets/0768043069504c41ad969a9315e48cf8/6544be8787f982baa225bff134d4ce82d0194155?placeholderIfAbsent=true&format=webp&width=400"
@@ -70,36 +68,40 @@
             <h2 class="section-title">Laporan Terbaru</h2>
             <a href="{{ route('reports.public') }}" class="section-link">Lihat Semua</a>
         </div>
-
         <div class="reports-grid">
-            {{-- Loop melalui laporan terbaru yang diambil dari database --}}
             @forelse($recentReports as $report)
                 <div class="report-card">
                     @php
-                        // fotoBukti sudah berupa array karena cast di Model Report
                         $photos = $report->fotoBukti;
                         $firstPhotoUrl = ($photos && is_array($photos) && !empty($photos)) ? asset('storage/' . $photos[0]) : asset('img/placeholder.jpg');
                     @endphp
                     <img src="{{ $firstPhotoUrl }}" alt="{{ $report->judul }}" class="report-image" loading="lazy">
                     <div class="report-content">
-                        <h3 class="report-title">{{ $report->judul }}</h3>
-                        <span class="report-category">{{ $report->category ?? 'Umum' }}</span>
+                        <div class="report-card-header">
+                            <span class="report-category">{{ $report->category ?? 'Umum' }}</span>
+                            {{-- PERBAIKAN: Menambahkan status di sini --}}
+                            @if($report->status)
+                                <span class="status-badge {{ strtolower($report->status) }}">{{ $report->status }}</span>
+                            @endif
+                        </div>
+                        <h3 class="report-title">{{ Str::limit($report->judul, 40) }}</h3>
                         <div class="report-location">
                             <span class="icon">📍</span>
-                            <span>{{ $report->lokasi }}</span>
+                            <span>{{ Str::limit($report->lokasi, 45) }}</span>
                         </div>
                         <div class="report-time">
                             <span class="icon">🕒</span>
                             <span>{{ $report->created_at->diffForHumans() }}</span>
                         </div>
                         <div class="report-footer">
-                            <span class="status-badge {{ strtolower($report->status) }}">{{ $report->status }}</span>
                             <a href="{{ route('reports.show', $report->id) }}" class="detail-link">Lihat Detail →</a>
                         </div>
                     </div>
                 </div>
             @empty
-                <p>Belum ada laporan terbaru.</p>
+                <div class="w-100 text-center py-4">
+                    <p>Belum ada laporan terbaru.</p>
+                </div>
             @endforelse
         </div>
     </div>
@@ -112,7 +114,6 @@
             <a href="{{ route('education.index') }}" class="section-link">Lihat Semua</a>
         </div>
         <div class="articles-grid">
-            {{-- PERBAIKAN: Menambahkan @if(isset(...)) untuk mencegah error jika variabel tidak ada --}}
             @if(isset($recentArticles))
                 @forelse($recentArticles as $article)
                     <article class="article-card">
@@ -124,7 +125,7 @@
                             </div>
                         </div>
                         <p class="article-excerpt">
-                            {{ Str::limit($article->content, 120) }}
+                            {{ Str::limit(strip_tags($article->content), 120) }}
                         </p>
                         <div class="article-footer">
                             <div class="article-author">
@@ -139,11 +140,6 @@
                         <p>Belum ada artikel edukasi yang dipublikasikan.</p>
                     </div>
                 @endforelse
-            @else
-                {{-- Tampilan ini akan muncul jika variabel $recentArticles tidak dikirim dari route --}}
-                <div class="text-center py-5" style="width: 100%;">
-                    <p>Tidak dapat memuat artikel saat ini. Harap periksa konfigurasi route.</p>
-                </div>
             @endif
         </div>
     </div>
